@@ -15,7 +15,6 @@ cd y_lab_tasks
  venv/bin/pip install -r requirements.txt 
 ```
 ## Создание в PostgreSQL пользователя - _someuser_ c паролем - _somepassword_ и БД - _menu_
-```
 Создать пользователя PostgreSQL в графическом интерфейсе.
 С помощью pgAdmin подключимся к базе данных и в разделе Login/Group Roles вызовем контекстное меню и выберем Create — Login/Group Role.
 ![Postgre_Create_Login_Group-Role](https://github.com/ralbakov/y_lab_tasks/blob/main/Postgre_Create_Login_Group-Role.png?raw=true).
@@ -26,7 +25,7 @@ cd y_lab_tasks
 Далее идем во вкладку Databases вызовем контекстное меню и выберем Create — Database...
 ![Create Database](https://github.com/ralbakov/y_lab_tasks/blob/main/Create_database.png?raw=true)
 Вводим имя даты базы _menu_, в строке Owner выбираем _someuser_ и сохраняем.
-```
+
 ## Запуск сервера
 ```
 uvicorn menu_restaurant.main:app --reload
