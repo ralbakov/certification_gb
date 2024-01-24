@@ -18,13 +18,13 @@ cd y_lab_tasks
 ```
 Создать пользователя PostgreSQL в графическом интерфейсе.
 С помощью pgAdmin подключимся к базе данных и в разделе Login/Group Roles вызовем контекстное меню и выберем Create — Login/Group Role.
-![Postgre_Create_Login_Group-Role](/Postgre_Create_Login_Group-Role.png).
+![Postgre_Create_Login_Group-Role](https://github.com/ralbakov/y_lab_tasks/blob/main/Postgre_Create_Login_Group-Role.png).
 Создаем пользователя с именем _"someuser"_ - именно это название пользователя.
-![Create login](/Create_login.png)
+![Create login](https://github.com/ralbakov/y_lab_tasks/blob/main/Create_login.png)
 На вкладке Definition зададим пароль _"somepassword"_ - именно этот пароль.
 На вкладке Privileges дополнительно ставим полномочия: Can login, Create role, Create databases и сохраняем.
 Далее идем во вкладку Databases вызовем контекстное меню и выберем Create — Database...
-![Create Database](/Create_database.png)
+![Create Database](https://github.com/ralbakov/y_lab_tasks/blob/main/Create_database.png)
 Вводим имя даты базы _menu_, в строке Owner выбираем _someuser_ и сохраняем.
 ```
 ## Запуск сервера
