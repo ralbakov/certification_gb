@@ -38,7 +38,7 @@ async def get_menus(db: Session = Depends(get_db)):
          )
 async def get_menu(target_menu_id: str, db: Session = Depends(get_db)):
    db_menu = crud.get_menu(db, menus_id=target_menu_id)
-   if db_menu == []:
+   if db_menu == None:
       raise HTTPException(status_code=404, detail='menu not found')
    return db_menu
 
@@ -47,7 +47,7 @@ async def get_menu(target_menu_id: str, db: Session = Depends(get_db)):
            )
 async def update_menu(target_menu_id: str, menu: schemas.MenusCreate, db: Session = Depends(get_db)):
    db_menu = crud.update_menu(db, menus_id=target_menu_id, menu=menu)
-   if db_menu is None:
+   if db_menu == None:
       raise HTTPException(status_code=404, detail="menu not found")
    return db_menu
 
@@ -74,7 +74,7 @@ async def create_submenu(target_menu_id: str, submenu: schemas.SubmenusCreate, d
          name="Просматривает определенное подменю")
 async def get_submenu(target_menu_id: str, target_submenu_id: str, db: Session = Depends(get_db)):
    db_submenu = crud.get_submenu(db=db, menus_id=target_menu_id, submenu_id=target_submenu_id)
-   if db_submenu == []:
+   if db_submenu == None:
       raise HTTPException(status_code=404, detail='submenu not found')
    return db_submenu
 
@@ -82,7 +82,7 @@ async def get_submenu(target_menu_id: str, target_submenu_id: str, db: Session =
            name="Обновляет подменю")
 async def update_submenu(target_menu_id: str, target_submenu_id: str, submenu: schemas.SubmenusCreate, db: Session = Depends(get_db)):
    db_submenu = crud.update_submenu(db=db, menus_id=target_menu_id, submenu_id=target_submenu_id, submenu=submenu)
-   if db_submenu is None:
+   if db_submenu == None:
       raise HTTPException(status_code=404, detail="submenu not found")
    return db_submenu
 
@@ -110,7 +110,7 @@ async def create_dishe(target_menu_id: str, target_submenu_id: str, dish: schema
          )
 async def get_list_dishes(target_menu_id: str, target_submenu_id: str, target_dish_id: str, db: Session = Depends(get_db)):
    db_dish = crud.get_dish(db=db, menus_id=target_menu_id, submenu_id=target_submenu_id, dishes_id=target_dish_id)
-   if db_dish == []:
+   if db_dish == None:
       raise HTTPException(status_code=404, detail="dish not found")
    return crud.get_dish(db=db, menus_id=target_menu_id, submenu_id=target_submenu_id, dishes_id=target_dish_id)
 
@@ -120,7 +120,7 @@ async def get_list_dishes(target_menu_id: str, target_submenu_id: str, target_di
          )
 async def update_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, dish: schemas.DishesCreate, db: Session = Depends(get_db)):
    db_dish = crud.update_dish(db=db, menus_id=target_menu_id, submenu_id=target_submenu_id, dishes_id=target_dish_id, dish=dish)
-   if db_dish is None:
+   if db_dish == None:
       raise HTTPException(status_code=404, detail="dish not found")
    return db_dish
 
