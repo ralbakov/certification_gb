@@ -15,15 +15,17 @@ cd y_lab_tasks
  venv/bin/pip install -r requirements.txt 
 ```
 ## Создание в PostgreSQL пользователя - _someuser_ c паролем - _somepassword_ и БД - _menu_
-Сначала подключаемся к PostgreSQL с Вашими правами администратора.
-Создаем пользователя с паролем.
-Назначаем ему кодировку.
-Назначаем этому пользователю новую БД.
-```bash
-sudo psql -U 'пользователь_важен_регистр' -d postgres
-CREATE USER someuser WITH PASSWORD somepassword;
-ALTER ROLE someuser SET client_encoding TO 'utf8';
-GRANT ALL PRIVILEGES ON DATABASE menu TO someuser;
+```
+Создать пользователя PostgreSQL в графическом интерфейсе.
+С помощью pgAdmin подключимся к базе данных и в разделе Login/Group Roles вызовем контекстное меню и выберем Create — Login/Group Role.
+![Postgre_Create_Login_Group-Role](/Postgre_Create_Login_Group-Role.png).
+Создаем пользователя с именем _"someuser"_ - именно это название пользователя.
+![Create login](/Create_login.png)
+На вкладке Definition зададим пароль _"somepassword"_ - именно этот пароль.
+На вкладке Privileges дополнительно ставим полномочия: Can login, Create role, Create databases и сохраняем.
+Далее идем во вкладку Databases вызовем контекстное меню и выберем Create — Database...
+![Create Database](/Create_database.png)
+Вводим имя даты базы _menu_, в строке Owner выбираем _someuser_ и сохраняем.
 ```
 ## Запуск сервера
 ```
