@@ -1,0 +1,37 @@
+version: '3.10'
+services:
+  test_api:
+    build:
+      context: .
+    container_name: test_api
+    env_file:
+      - .env_test_db
+    depends_on:
+      - test_db
+    command: /bin/bash -c "sleep 15 && pytest"
+
+  test_db:
+    image: postgres:15.1-alpine
+    container_name: test_db
+    env_file:
+      - .env_test_db
+
+  prod_db:
+    image: postgres:15.1-alpine
+    container_name: prod_db
+    env_file:
+      - .env_prod
+    depends_on:
+      - test_api
+  
+  prod_api:
+    build:
+      context: .
+    container_name: prod_api
+    env_file:
+      - .env_prod
+    ports:
+      - 8000:8000
+    depends_on:
+      - prod_db
+    command: /bin/bash -c "sleep 15 && python -m uvicorn menu_restaurant.main:app --reload --host 0.0.0.0 --port 8000"

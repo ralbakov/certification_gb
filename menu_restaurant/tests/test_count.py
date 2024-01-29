@@ -1,16 +1,16 @@
+import pytest, os
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import pytest
 
 from ..database import Base
 from ..main import app, get_db
 
-SQLALCHEMY_DATABASE_URL = "postgresql://someuser:somepassword@localhost:5432/test_menu"
+TEST_DATABASE_URL = os.getenv("DB_URL")
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
+    TEST_DATABASE_URL,
     poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
