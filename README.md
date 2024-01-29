@@ -1,10 +1,10 @@
 Rest API приложение для работы с меню ресторана. 
 ## Стек: 
-API - FlaskAPI \
-ORM - sqlalchemy \
-БД - PostgreSQL \ 
-Тестирование - pytest \
-DevOps - Docker \
+API - FlaskAPI  \
+ORM - sqlalchemy  \
+БД - PostgreSQL  \
+Тестирование - pytest  \
+DevOps - Docker  \
 ## Задача
 В этом домашнем задании надо написать тесты для ранее разработанных ендпоинтов вашего API после Вебинара №1.
 
