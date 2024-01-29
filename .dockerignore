@@ -1,0 +1,13 @@
+venv/
+**/*__pycache__
+**/*.pyc
+**/*.gitignore
+**/*.DS_Store
+Create_database.png
+Create_login.png
+Postgre_Create_Login_Group-Role.png
+**/*.pytest_cache
+**/*.git
+Dockerfile
+not_use_docker
+t.py
