@@ -1,5 +1,5 @@
 Rest API приложение для работы с меню ресторана. 
-Стек: 
+## Стек: 
 API - FlaskAPI
 ORM - sqlalchemy
 БД - PostgreSQL
