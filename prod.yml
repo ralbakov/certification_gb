@@ -1,28 +1,11 @@
 version: '3.10'
 services:
-  test_api:
-    build:
-      context: .
-    container_name: test_api
-    env_file:
-      - .env_test_db
-    depends_on:
-      - test_db
-    command: /bin/bash -c "sleep 15 && pytest -v"
-
-  test_db:
-    image: postgres:15.1-alpine
-    container_name: test_db
-    env_file:
-      - .env_test_db
-
   prod_db:
     image: postgres:15.1-alpine
     container_name: prod_db
     env_file:
       - .env_prod
-    depends_on:
-      - test_api
+
   
   prod_api:
     build:
