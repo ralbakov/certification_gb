@@ -25,7 +25,7 @@ DevOps - Docker
 
 # Решение
 ```
-Ответ на вопрос № 3 реализован в файле: [https://github.com/ralbakov/y_lab_tasks/blob/main/menu_restaurant/models.py] строки с 46 по 59
+Ответ на вопрос № 3 реализован в файле: [menu_restaurant/models.py](https://github.com/ralbakov/y_lab_tasks/blob/main/menu_restaurant/models.py) строки с 46 по 59
 ```
 
 ## Копирование репозитория
