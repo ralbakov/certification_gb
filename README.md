@@ -22,6 +22,12 @@ DevOps - Docker
 
 *Оборачиваем приложение в докер.
 **CRUD – create/update/retrieve/delete.
+
+# Решение
+```
+Ответ на вопрос № 3 реализован в файле: https://github.com/ralbakov/y_lab_tasks/blob/main/menu_restaurant/models.py строки с 46 по 59
+```
+
 ## Копирование репозитория
 ```bash
 mkdir 'your some folder'
