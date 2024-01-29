@@ -4,8 +4,8 @@ API - FlaskAPI  \
 ORM - sqlalchemy  \
 БД - PostgreSQL  \
 Тестирование - pytest  \
-DevOps - Docker  \
-## Задача
+DevOps - Docker  
+# Задача
 В этом домашнем задании надо написать тесты для ранее разработанных ендпоинтов вашего API после Вебинара №1.
 
 Обернуть программные компоненты в контейнеры. Контейнеры должны запускаться по одной команде “docker-compose up -d” или той которая описана вами в readme.md.
@@ -29,23 +29,23 @@ DevOps - Docker  \
 
 
 ## Копирование репозитория
-```bash
-mkdir 'your some folder'
-cd 'your some folder'
-git clone https://github.com/ralbakov/y_lab_tasks.git
+```
+git clone https://github.com/ralbakov/y_lab_tasks.git  
+  
+После завершения клонирования репозитория, необходимо перейти в папку "y_lab_tasks".   
+Для этого в терминале выполните нижеуказанную команду:  
+  
 cd y_lab_tasks
 ```
-## Подготовка окружения
-```bash
- python3 -m venv venv
- source venv/bin/activate
-```
+
 ## Запуск
 ### Основное приложение
 ```
-Используйте команду docker-compose -f prod.yml up
+Находясь в папке "y_lab_tasks", в командной строке выполните команду:  
+docker-compose -f prod.yml up
 ```
 ### Тестирование приложения
 ```
-Для запуска контейнеров тестов используйте команду docker-compose -f test.yml up
-```
+Находясь в папке "y_lab_tasks", в командной строке выполните команду:  
+docker-compose -f test.yml up
+``` 
