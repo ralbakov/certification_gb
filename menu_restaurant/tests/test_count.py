@@ -1,4 +1,7 @@
-import pytest, os
+import os
+
+import pytest
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -7,7 +10,9 @@ from sqlalchemy.pool import StaticPool
 from ..database import Base
 from ..main import app, get_db
 
-TEST_DATABASE_URL = os.getenv("DB_URL")
+load_dotenv()
+
+TEST_DATABASE_URL = os.getenv('DB_URL')
 
 engine = create_engine(
     TEST_DATABASE_URL,
@@ -35,155 +40,147 @@ client = TestClient(app)
 
 def pytest_namespace():
     return {
-        'shared': None, 
+        'shared': None,
         'shared_sub_id': None,
         'shared_dish_id': None,
     }
 
 
 def test_create_menu():
-    '''
-    Тестирует создание меню.
-    '''
+    """Тестирует создание меню."""
+
     response = client.post(
-        "/api/v1/menus",
+        '/api/v1/menus',
         json={
-                "title": "My menu 1", 
-                "description": "My menu description 1"
-            }
+            'title': 'My menu 1',
+            'description': 'My menu description 1'
+        }
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 201, response.text
     data = response.json()
     pytest.shared = data['id']
-    assert data['title'] == "My menu 1"
-    assert data['description'] == "My menu description 1"
-    assert data['id'] == f"{pytest.shared}"
+    assert data['title'] == 'My menu 1'
+    assert data['description'] == 'My menu description 1'
+    assert data['id'] == f'{pytest.shared}'
 
 
 def test_create_submenu():
-    '''
-    Тестирует создание субменю.
-    '''
+    """Тестирует создание субменю."""
+
     target_menu_id = pytest.shared
     response = client.post(
-        f"/api/v1/menus/{target_menu_id}/submenus",
+        f'/api/v1/menus/{target_menu_id}/submenus',
         json={
-                "title": "My submenu 1", 
-                "description": "My submenu description 1"
-            }
+            'title': 'My submenu 1',
+            'description': 'My submenu description 1'
+        }
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 201, response.text
     data = response.json()
     pytest.shared_sub_id = data['id']
-    assert data['title'] == "My submenu 1"
-    assert data['description'] == "My submenu description 1"
-    assert data['id'] == f"{pytest.shared_sub_id}"
+    assert data['title'] == 'My submenu 1'
+    assert data['description'] == 'My submenu description 1'
+    assert data['id'] == f'{pytest.shared_sub_id}'
 
 
 def test_create_dish_first():
-    '''
-    Тестирует создание 1-го блюда.
-    '''
+    """Тестирует создание 1-го блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.post(
-        f"/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes",
+        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
         json={
-                "title": "My dish 1", 
-                "description": "My dish description 1", 
-                "price": "12.50"
-            }
+            'title': 'My dish 1',
+            'description': 'My dish description 1',
+            'price': '12.50'
+        }
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 201, response.text
     data = response.json()
     pytest.shared_dish_id = data['id']
-    assert data['title'] == "My dish 1"
-    assert data['description'] == "My dish description 1"
-    assert data['price'] == "12.50"
-    assert data['id'] == f"{pytest.shared_dish_id}"
+    assert data['title'] == 'My dish 1'
+    assert data['description'] == 'My dish description 1'
+    assert data['price'] == '12.50'
+    assert data['id'] == f'{pytest.shared_dish_id}'
 
 
 def test_create_dish_second():
-    '''
-    Тестирует создание 2-го блюда.
-    '''
+    """Тестирует создание 2-го блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.post(
-        f"/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes",
+        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
         json={
-                "title": "My dish 2", 
-                "description": "My dish description 2", 
-                "price": "13.50"
-            }
+            'title': 'My dish 2',
+            'description': 'My dish description 2',
+            'price': '13.50'
+        }
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 201, response.text
     data = response.json()
     pytest.shared_dish_id = data['id']
-    assert data['title'] == "My dish 2"
-    assert data['description'] == "My dish description 2"
-    assert data['price'] == "13.50"
-    assert data['id'] == f"{pytest.shared_dish_id}"
+    assert data['title'] == 'My dish 2'
+    assert data['description'] == 'My dish description 2'
+    assert data['price'] == '13.50'
+    assert data['id'] == f'{pytest.shared_dish_id}'
 
 
 def test_get_submenu_dish_count():
-    '''
-    Тестирует просмотр определенного меню с количеством субменю и блюд.
-    '''
+    """Тестирует просмотр определенного меню с количеством субменю и блюд."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f"/api/v1/menus/{target_menu_id}",
+        f'/api/v1/menus/{target_menu_id}',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
     data = response.json()
-    assert data['id'] == f"{target_menu_id}"
+    assert data['id'] == f'{target_menu_id}'
     assert data['submenus_count'] == 1
     assert data['dishes_count'] == 2
-    assert data['title'] == "My menu 1"
-    assert data['description'] == "My menu description 1"
+    assert data['title'] == 'My menu 1'
+    assert data['description'] == 'My menu description 1'
 
 
 def test_get_dish_count():
-    '''
-    Тестирует просмотр определенного субменю с количеством блюд.
-    '''
+    """Тестирует просмотр определенного субменю с количеством блюд."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.get(
-        f"/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}",
+        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
     data = response.json()
-    assert data['id'] == f"{target_submenu_id}"
+    assert data['id'] == f'{target_submenu_id}'
     assert data['dishes_count'] == 2
 
 
 def test_delete_submenu():
-    '''
-    Тестирует удаление субменю.
-    '''
+    """Тестирует удаление субменю."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.delete(
-        f"/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}", 
+        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
 
 
 def test_get_submenus():
-    '''
-    Тестирует список субменю.
-    '''
+    """Тестирует список субменю."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f"/api/v1/menus/{target_menu_id}/submenus",
+        f'/api/v1/menus/{target_menu_id}/submenus',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -192,13 +189,12 @@ def test_get_submenus():
 
 
 def test_get_empty_dishes():
-    '''
-    Тестирует просмотр списка блюд.
-    '''
+    """Тестирует просмотр списка блюд."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.get(
-        f"/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes",
+        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -207,39 +203,36 @@ def test_get_empty_dishes():
 
 
 def test_get_one_menu():
-    '''
-    Тестирует просмотр меню.
-    '''
+    """Тестирует просмотр меню."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f"/api/v1/menus/{target_menu_id}",
+        f'/api/v1/menus/{target_menu_id}',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
     data = response.json()
-    assert data['title'] == "My menu 1"
-    assert data['description'] == "My menu description 1"
-    assert data['id'] == f"{target_menu_id}"
+    assert data['title'] == 'My menu 1'
+    assert data['description'] == 'My menu description 1'
+    assert data['id'] == f'{target_menu_id}'
 
 
 def test_delete_menu():
-    '''
-    Тестирует удаление меню.
-    '''
+    """Тестирует удаление меню."""
+
     target_menu_id = pytest.shared
     response = client.delete(
-        f"/api/v1/menus/{target_menu_id}",
+        f'/api/v1/menus/{target_menu_id}',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
 
 
 def test_get_empty_menus():
-    '''
-    Тестирует пустой список меню.
-    '''
+    """Тестирует пустой список меню."""
+
     response = client.get(
-        "/api/v1/menus",
+        '/api/v1/menus',
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text

@@ -9,5 +9,3 @@ Postgre_Create_Login_Group-Role.png
 **/*.pytest_cache
 **/*.git
 Dockerfile
-not_use_docker
-t.py
