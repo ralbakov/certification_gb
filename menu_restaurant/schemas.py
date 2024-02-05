@@ -1,10 +1,13 @@
-from pydantic import UUID4, BaseModel, StrictInt, StrictStr
+from decimal import Decimal
+
+from pydantic import UUID4, BaseModel, Field, StrictInt, StrictStr
+from typing_extensions import Annotated
 
 
 class DishesBase(BaseModel):
     title: StrictStr
     description: StrictStr | None
-    price: StrictStr
+    price: Annotated[Decimal, Field(decimal_places=2)]
 
 
 class DishesCreate(DishesBase):

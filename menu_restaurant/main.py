@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from menu_restaurant.database import SessionLocal, engine
@@ -8,7 +8,15 @@ from . import crud, models, schemas
 
 models.Base.metadata.create_all(bind=engine)
 
+
 app = FastAPI()
+
+menu_router = APIRouter(prefix='/api/v1/menus')
+
+submenu_router = APIRouter(prefix=('/api/v1/menus'
+                                   '/{target_menu_id}/submenus'))
+
+dish_router = APIRouter(prefix=('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes'))
 
 
 def get_db():
@@ -19,12 +27,12 @@ def get_db():
         db.close()
 
 
-@app.post('/api/v1/menus',
-          status_code=201,
-          name='Создает меню',
-          response_model=schemas.Menus,
-          tags=['Меню']
-          )
+@menu_router.post('',
+                  status_code=201,
+                  name='Создает меню',
+                  response_model=schemas.Menus,
+                  tags=['Menu']
+                  )
 async def create_menu(menu: schemas.MenusCreate,
                       db: Session = Depends(get_db)):
     menu = crud.create_menu(db=db, menu=menu)
@@ -32,11 +40,11 @@ async def create_menu(menu: schemas.MenusCreate,
     return menu
 
 
-@app.get('/api/v1/menus',
-         name='Просматривает список меню',
-         response_model=list[schemas.Menus],
-         tags=['Меню']
-         )
+@menu_router.get('',
+                 name='Просматривает список меню',
+                 response_model=list[schemas.Menus],
+                 tags=['Menu']
+                 )
 async def get_menus(db: Session = Depends(get_db)):
     get_all_menu_cache = RedisCache.get_all_menu()
     if get_all_menu_cache is not None or get_all_menu_cache == []:
@@ -46,14 +54,14 @@ async def get_menus(db: Session = Depends(get_db)):
     return db_all_menu
 
 
-@app.get('/api/v1/menus/{target_menu_id}',
-         name='Просматривает определенное меню',
-         response_model=schemas.Menus,
-         tags=['Меню']
-         )
+@menu_router.get('/{target_menu_id}',
+                 name='Просматривает определенное меню',
+                 response_model=schemas.Menus,
+                 tags=['Menu']
+                 )
 async def get_menu(target_menu_id: str,
                    db: Session = Depends(get_db)):
-    if target_menu_id not in RedisCache.cache_menu():
+    if target_menu_id not in RedisCache.get_all_keys_menu():
         db_menu = crud.get_menu(db, menus_id=target_menu_id)
         if db_menu is None:
             raise HTTPException(status_code=404, detail='menu not found')
@@ -67,7 +75,7 @@ async def get_menu(target_menu_id: str,
 @app.patch('/api/v1/menus/{target_menu_id}',
            name='Обновляет меню',
            response_model=schemas.Menus,
-           tags=['Меню']
+           tags=['Menu']
            )
 async def update_menu(target_menu_id: str,
                       menu: schemas.MenusUpdate,
@@ -80,18 +88,18 @@ async def update_menu(target_menu_id: str,
     return db_menu
 
 
-@app.delete('/api/v1/menus/{target_menu_id}', name='Удаляет меню', tags=['Меню'])
+@menu_router.delete('/{target_menu_id}', name='Удаляет меню', tags=['Menu'])
 async def delete_menu(target_menu_id: str, db: Session = Depends(get_db)):
     db_menu = crud.delete_menu(db, menus_id=target_menu_id)
     RedisCache.delete_menu(id=target_menu_id)
     return db_menu
 
 
-@app.get('/api/v1/menus/{target_menu_id}/submenus',
-         name='Просматривает список подменю',
-         response_model=list[schemas.Submenus],
-         tags=['Подменю']
-         )
+@submenu_router.get('',
+                    name='Просматривает список подменю',
+                    response_model=list[schemas.Submenus],
+                    tags=['Submenu']
+                    )
 async def get_list_submenus(target_menu_id: str,
                             db: Session = Depends(get_db)):
     get_all_submenu_cache = RedisCache.get_all_submenu(target_menu_id=target_menu_id)
@@ -102,11 +110,11 @@ async def get_list_submenus(target_menu_id: str,
     return db_all_submenu
 
 
-@app.post('/api/v1/menus/{target_menu_id}/submenus',
-          name='Создает подменю',
-          status_code=201,
-          response_model=schemas.Submenus,
-          tags=['Подменю'])
+@submenu_router.post('',
+                     name='Создает подменю',
+                     status_code=201,
+                     response_model=schemas.Submenus,
+                     tags=['Submenu'])
 async def create_submenu(target_menu_id: str,
                          submenu: schemas.SubmenusCreate,
                          db: Session = Depends(get_db)):
@@ -119,14 +127,14 @@ async def create_submenu(target_menu_id: str,
     return submenu
 
 
-@app.get('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
-         name='Просматривает определенное подменю',
-         response_model=schemas.Submenus,
-         tags=['Подменю'])
+@submenu_router.get('/{target_submenu_id}',
+                    name='Просматривает определенное подменю',
+                    response_model=schemas.Submenus,
+                    tags=['Submenu'])
 async def get_submenu(target_menu_id: str,
                       target_submenu_id: str,
                       db: Session = Depends(get_db)):
-    if target_submenu_id not in RedisCache.cache_submenu(target_menu_id=target_menu_id):
+    if target_submenu_id not in RedisCache.get_all_keys_submenu(target_menu_id=target_menu_id):
         db_submenu = crud.get_submenu(db=db,
                                       menus_id=target_menu_id,
                                       submenu_id=target_submenu_id
@@ -145,10 +153,10 @@ async def get_submenu(target_menu_id: str,
     return get_submenu_cache
 
 
-@app.patch('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
-           name='Обновляет подменю',
-           response_model=schemas.Submenus,
-           tags=['Подменю'])
+@submenu_router.patch('/{target_submenu_id}',
+                      name='Обновляет подменю',
+                      response_model=schemas.Submenus,
+                      tags=['Submenu'])
 async def update_submenu(target_menu_id: str,
                          target_submenu_id: str,
                          submenu: schemas.SubmenusUpdate,
@@ -167,8 +175,8 @@ async def update_submenu(target_menu_id: str,
     return db_submenu
 
 
-@app.delete('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
-            name='Удаляет подменю', tags=['Подменю'])
+@submenu_router.delete('/{target_submenu_id}',
+                       name='Удаляет подменю', tags=['Submenu'])
 async def delete_submenu(target_menu_id: str,
                          target_submenu_id: str,
                          db: Session = Depends(get_db)):
@@ -181,11 +189,11 @@ async def delete_submenu(target_menu_id: str,
     return db_submenu
 
 
-@app.get('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
-         name='Просматривает список блюд',
-         response_model=list[schemas.Dishes],
-         tags=['Блюдо']
-         )
+@dish_router.get('',
+                 name='Просматривает список блюд',
+                 response_model=list[schemas.Dishes],
+                 tags=['Dish']
+                 )
 async def get_list_dishes(target_menu_id: str,
                           target_submenu_id: str,
                           db: Session = Depends(get_db)):
@@ -199,12 +207,11 @@ async def get_list_dishes(target_menu_id: str,
     return db_all_dish
 
 
-@app.post(('/api/v1/menus/{target_menu_id}'
-           '/submenus/{target_submenu_id}/dishes'),
-          name='Создает блюдо',
-          status_code=201,
-          response_model=schemas.Dishes,
-          tags=['Блюдо'])
+@dish_router.post('',
+                  name='Создает блюдо',
+                  status_code=201,
+                  response_model=schemas.Dishes,
+                  tags=['Dish'])
 async def create_dishe(target_menu_id: str,
                        target_submenu_id: str,
                        dish: schemas.DishesCreate,
@@ -222,18 +229,16 @@ async def create_dishe(target_menu_id: str,
     return dish
 
 
-@app.get(('/api/v1/menus/{target_menu_id}'
-          '/submenus/{target_submenu_id}'
-          '/dishes/{target_dish_id}'),
-         name='Просматривает определенное блюдо',
-         response_model=schemas.Dishes,
-         tags=['Блюдо']
-         )
+@dish_router.get('/{target_dish_id}',
+                 name='Просматривает определенное блюдо',
+                 response_model=schemas.Dishes,
+                 tags=['Dish']
+                 )
 async def get_dish(target_menu_id: str,
                    target_submenu_id: str,
                    target_dish_id: str,
                    db: Session = Depends(get_db)):
-    if target_dish_id not in RedisCache.cache_dish(target_submenu_id=target_submenu_id):
+    if target_dish_id not in RedisCache.get_all_keys_dishes(target_submenu_id=target_submenu_id):
         db_dish = crud.get_dish(db=db,
                                 menus_id=target_menu_id,
                                 submenu_id=target_submenu_id,
@@ -252,13 +257,11 @@ async def get_dish(target_menu_id: str,
     return get_dish_cache
 
 
-@app.patch(('/api/v1/menus/{target_menu_id}'
-            '/submenus/{target_submenu_id}'
-            '/dishes/{target_dish_id}'),
-           name='Обновляет блюдо',
-           response_model=schemas.Dishes,
-           tags=['Блюдо']
-           )
+@dish_router.patch('/{target_dish_id}',
+                   name='Обновляет блюдо',
+                   response_model=schemas.Dishes,
+                   tags=['Dish']
+                   )
 async def update_dish(target_menu_id: str,
                       target_submenu_id: str,
                       target_dish_id: str,
@@ -279,12 +282,10 @@ async def update_dish(target_menu_id: str,
     return db_dish
 
 
-@app.delete(('/api/v1/menus/{target_menu_id}'
-             '/submenus/{target_submenu_id}'
-             '/dishes/{target_dish_id}'),
-            name='Удаляет блюдо',
-            tags=['Блюдо']
-            )
+@dish_router.delete('/{target_dish_id}',
+                    name='Удаляет блюдо',
+                    tags=['Dish']
+                    )
 async def delete_dish(target_menu_id: str,
                       target_submenu_id: str,
                       target_dish_id: str,
@@ -298,3 +299,7 @@ async def delete_dish(target_menu_id: str,
                            target_submenu_id=target_submenu_id,
                            id=target_dish_id)
     return db_dish
+
+app.include_router(menu_router)
+app.include_router(submenu_router)
+app.include_router(dish_router)

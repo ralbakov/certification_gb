@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 
 from ..database import Base
 from ..main import app, get_db
+from ..tests.reverse import reverse
 
 load_dotenv()
 
@@ -47,11 +48,10 @@ def pytest_namespace():
 
 
 def test_get_empty_menus():
-    """
-    Тестирует пустой список меню.
-    """
+    """Тестирует пустой список меню."""
+
     response = client.get(
-        '/api/v1/menus',
+        reverse('Просматривает список меню')
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -60,11 +60,10 @@ def test_get_empty_menus():
 
 
 def test_create_menu():
-    """
-    Тестирует создание меню.
-    """
+    """Тестирует создание меню."""
+
     response = client.post(
-        '/api/v1/menus',
+        reverse('Создает меню'),
         json={
             'title': 'My menu 1',
             'description': 'My menu description 1'
@@ -80,11 +79,10 @@ def test_create_menu():
 
 
 def test_get_menus():
-    """
-    Тестирует непустой список меню.
-    """
+    """Тестирует непустой список меню."""
+
     response = client.get(
-        '/api/v1/menus',
+        reverse('Просматривает список меню')
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -93,12 +91,12 @@ def test_get_menus():
 
 
 def test_get_one_menu():
-    """
-    Тестирует просмотр меню.
-    """
+    """Тестирует просмотр меню."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}',
+        reverse('Просматривает определенное меню',
+                **{'target_menu_id': target_menu_id}),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -109,12 +107,12 @@ def test_get_one_menu():
 
 
 def test_update_menu():
-    """
-    Тестирует обновление меню.
-    """
+    """Тестирует обновление меню."""
+
     target_menu_id = pytest.shared
     response = client.patch(
-        f'/api/v1/menus/{target_menu_id}',
+        reverse('Обновляет меню',
+                **{'target_menu_id': target_menu_id}),
         json={
             'title': 'My updated menu 1',
             'description': 'My updated menu description 1'
@@ -129,12 +127,12 @@ def test_update_menu():
 
 
 def test_get_empty_submenus():
-    """
-    Тестирует пустой список субменю.
-    """
+    """Тестирует пустой список субменю."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus',
+        reverse('Просматривает список подменю',
+                **{'target_menu_id': target_menu_id})
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -143,12 +141,12 @@ def test_get_empty_submenus():
 
 
 def test_create_submenu():
-    """
-    Тестирует создание субменю.
-    """
+    """Тестирует создание субменю."""
+
     target_menu_id = pytest.shared
     response = client.post(
-        f'/api/v1/menus/{target_menu_id}/submenus',
+        reverse('Создает подменю',
+                **{'target_menu_id': target_menu_id}),
         json={
             'title': 'My submenu 1',
             'description': 'My submenu description 1'
@@ -164,12 +162,12 @@ def test_create_submenu():
 
 
 def test_get_submenus():
-    """
-    Тестирует непустой список субменю.
-    """
+    """Тестирует непустой список субменю."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus',
+        reverse('Просматривает список подменю',
+                **{'target_menu_id': target_menu_id}),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -178,13 +176,14 @@ def test_get_submenus():
 
 
 def test_get_one_submenu():
-    """
-    Тестирует просмотр субменю.
-    """
+    """Тестирует просмотр субменю."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
+        reverse('Просматривает определенное подменю',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id})
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -195,13 +194,14 @@ def test_get_one_submenu():
 
 
 def test_update_submenu():
-    """
-    Тестирует обновление субменю.
-    """
+    """Тестирует обновление субменю."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.patch(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
+        reverse('Обновляет подменю',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id}),
         json={
             'title': 'My updated submenu 1',
             'description': 'My updated submenu description 1'
@@ -216,13 +216,14 @@ def test_update_submenu():
 
 
 def test_get_empty_dishes():
-    """
-    Тестирует просмотр пустых блюд (когда еще нет блюд).
-    """
+    """Тестирует просмотр пустых блюд (когда еще нет блюд)."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
+        reverse('Просматривает список блюд',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id}),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -231,13 +232,14 @@ def test_get_empty_dishes():
 
 
 def test_create_dish():
-    """
-    Тестирует создание блюда.
-    """
+    """Тестирует создание блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.post(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
+        reverse('Создает блюдо',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id}),
         json={
             'title': 'My dish 1',
             'description': 'My dish description 1',
@@ -255,13 +257,15 @@ def test_create_dish():
 
 
 def test_get_dishes():
-    """
-    Тестирует просмотр, когда список блюд непустой.
-    """
+    """Тестирует просмотр, когда список блюд непустой."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes',
+        reverse('Просматривает список блюд',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id}
+                ),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -270,14 +274,17 @@ def test_get_dishes():
 
 
 def test_get_dish():
-    """
-    Тестирует просмотр блюда.
-    """
+    """Тестирует просмотр блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     target_dish_id = pytest.shared_dish_id
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}',
+        reverse('Просматривает определенное блюдо',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id,
+                   'target_dish_id': target_dish_id}
+                )
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
@@ -289,14 +296,17 @@ def test_get_dish():
 
 
 def test_update_dish():
-    """
-    Тестирует обновление блюда.
-    """
+    """Тестирует обновление блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     target_dish_id = pytest.shared_dish_id
     response = client.patch(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}',
+        reverse('Обновляет блюдо',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id,
+                   'target_dish_id': target_dish_id}
+                ),
         json={
             'title': 'My updated dish 1',
             'description': 'My updated dish description 1',
@@ -313,28 +323,34 @@ def test_update_dish():
 
 
 def test_delete_dish():
-    """
-    Тестирует удаление блюда.
-    """
+    """Тестирует удаление блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     target_dish_id = pytest.shared_dish_id
     response = client.delete(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}',
+        reverse('Удаляет блюдо',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id,
+                   'target_dish_id': target_dish_id}
+                ),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
 
 
 def test_get_dish_deleted():
-    """
-    Тестирует просмотр удаленного блюда.
-    """
+    """Тестирует просмотр удаленного блюда."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     target_dish_id = pytest.shared_dish_id
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}',
+        reverse('Просматривает определенное блюдо',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id,
+                   'target_dish_id': target_dish_id}
+                ),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 404, response.text
@@ -342,26 +358,29 @@ def test_get_dish_deleted():
 
 
 def test_delete_submenu():
-    """
-    Тестирует удаление субменю.
-    """
+    """Тестирует удаление субменю."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.delete(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
+        reverse('Удаляет подменю',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id}
+                ),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
 
 
 def test_get_submenu_deleted():
-    """
-    Тестирует просмотр удаленного субменю.
-    """
+    """Тестирует просмотр удаленного субменю."""
+
     target_menu_id = pytest.shared
     target_submenu_id = pytest.shared_sub_id
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}',
+        reverse('Просматривает определенное подменю',
+                **{'target_menu_id': target_menu_id,
+                   'target_submenu_id': target_submenu_id}),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 404, response.text
@@ -369,24 +388,24 @@ def test_get_submenu_deleted():
 
 
 def test_delete_menu():
-    """
-    Тестирует удаление меню.
-    """
+    """Тестирует удаление меню."""
+
     target_menu_id = pytest.shared
     response = client.delete(
-        f'/api/v1/menus/{target_menu_id}',
+        reverse('Удаляет меню',
+                **{'target_menu_id': target_menu_id})
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 200, response.text
 
 
 def test_get_menu_deleted():
-    """
-    Тестирует просмотр удаленного меню.
-    """
+    """Тестирует просмотр удаленного меню."""
+
     target_menu_id = pytest.shared
     response = client.get(
-        f'/api/v1/menus/{target_menu_id}',
+        reverse('Просматривает определенное меню',
+                **{'target_menu_id': target_menu_id}),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 404, response.text

@@ -46,22 +46,21 @@ class RedisCache:
         return None
 
     @classmethod
-    def delete_menu(cls, id: str):
+    def delete_menu(cls, id: str) -> dict[str, str]:
         """Удалить меню из кэша redis."""
 
         all_keys_submenu = cls.rd.hkeys(id)
         for item_submenu in all_keys_submenu:
-            all_keys_dish = cls.rd.hkeys(item_submenu.decode('utf-8'))
+            all_keys_dish = cls.rd.hkeys(item_submenu)
             for item_dish in all_keys_dish:
-                cls.rd.hdel(item_submenu.decode('utf-8'), item_dish.decode('utf-8'))
-            cls.rd.hdel(id, item_submenu.decode('utf-8'))
+                cls.rd.hdel(item_submenu, item_dish)
+            cls.rd.hdel(id, item_submenu)
 
         cls.rd.hdel(HASH_NAME, id)
-
         return {'message': 'menu deleted'}
 
     @classmethod
-    def cache_menu(cls):
+    def get_all_keys_menu(cls):
         """Получить все ключи (id) кеша меню"""
 
         return [i.decode('utf-8') for i in cls.rd.hkeys(HASH_NAME)]
@@ -104,12 +103,12 @@ class RedisCache:
         return None
 
     @classmethod
-    def delete_submenu(cls, target_menu_id: str, id: str):
+    def delete_submenu(cls, target_menu_id: str, id: str) -> dict[str, str]:
         """Удалить подменю из кэша redis."""
 
         all_keys_dish = cls.rd.hkeys(id)
         for item in all_keys_dish:
-            cls.rd.hdel(id, item.decode('utf-8'))
+            cls.rd.hdel(id, item)
 
         cls.rd.hdel(target_menu_id, id)
 
@@ -122,7 +121,7 @@ class RedisCache:
         return {'message': 'submenu deleted'}
 
     @classmethod
-    def cache_submenu(cls, target_menu_id: str):
+    def get_all_keys_submenu(cls, target_menu_id: str):
         """Получить все ключи (id) кеша подменю"""
 
         return [i.decode('utf-8') for i in cls.rd.hkeys(target_menu_id)]
@@ -170,7 +169,7 @@ class RedisCache:
         return None
 
     @classmethod
-    def delete_dish(cls, target_menu_id: str, target_submenu_id: str, id: str):
+    def delete_dish(cls, target_menu_id: str, target_submenu_id: str, id: str) -> dict[str, str]:
         """Удалить бдюдо из кэша redis."""
 
         cls.rd.hdel(target_submenu_id, id)
@@ -188,7 +187,7 @@ class RedisCache:
         return {'message': 'dish deleted'}
 
     @classmethod
-    def cache_dish(cls, target_submenu_id: str):
+    def get_all_keys_dishes(cls, target_submenu_id: str):
         """Получить все ключи (id) кеша блюда"""
 
         return [i.decode('utf-8') for i in cls.rd.hkeys(target_submenu_id)]
