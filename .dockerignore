@@ -9,3 +9,6 @@ Postgre_Create_Login_Group-Role.png
 **/*.pytest_cache
 **/*.git
 Dockerfile
+.mypy_cache
+.pre-commit-config.yaml
+.pytest_cache
