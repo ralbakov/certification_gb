@@ -12,3 +12,4 @@ Dockerfile
 .mypy_cache
 .pre-commit-config.yaml
 .pytest_cache
+.env.work

@@ -4,7 +4,7 @@ from sqlalchemy import Column, ForeignKey, String, and_, func, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import column_property, relationship
 
-from menu_restaurant.database import Base
+from menu_restaurant.database.session import Base
 
 
 class Dishes(Base):

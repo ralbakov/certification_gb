@@ -4,9 +4,9 @@ import pickle
 import redis
 from dotenv import load_dotenv
 
-from menu_restaurant import models
+from menu_restaurant.database import models
 
-load_dotenv()
+load_dotenv('.env.work')
 
 HASH_NAME: str = 'full_menu'
 """Переменная для присвоения имению хэшу"""
@@ -14,10 +14,10 @@ HASH_NAME: str = 'full_menu'
 
 class RedisCache:
     """Класс для установки соединения с redis и работой с кешем."""
-    __rd = redis.Redis(host=f"{os.getenv('REDIS_HOST')}", port=os.getenv('REDIS_PORT'))  # type: ignore
+    __rd = redis.Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']))
 
     @classmethod
-    def get_all_menu(cls) -> list[models.Menus] | None:
+    def get_all_menu(cls) -> list[models.Menus] | list[None]:
         """Получить все меню из кэша redis."""
 
         result = cls.__rd.hvals(HASH_NAME)
@@ -49,7 +49,7 @@ class RedisCache:
         return None
 
     @classmethod
-    def delete_menu(cls, id: str) -> dict[str, str]:
+    def delete_menu(cls, id: str) -> None:
         """Удалить меню из кэша redis."""
 
         all_keys_submenu = cls.__rd.hkeys(id)
@@ -60,16 +60,16 @@ class RedisCache:
             cls.__rd.hdel(id, item_submenu)
 
         cls.__rd.hdel(HASH_NAME, id)
-        return {'message': 'menu deleted'}
+        return None
 
     @classmethod
-    def get_all_keys_menu(cls):
+    def get_all_keys_menu(cls) -> list[str]:
         """Получить все ключи (id) кеша меню"""
 
         return [i.decode('utf-8') for i in cls.__rd.hkeys(HASH_NAME)]
 
     @classmethod
-    def get_all_submenu(cls, target_menu_id: str) -> list[models.Submenus] | None:
+    def get_all_submenu(cls, target_menu_id: str) -> list[models.Submenus] | list[None]:
         """Получить все подменю из кэша redis."""
 
         result = cls.__rd.hvals(target_menu_id)
@@ -85,7 +85,8 @@ class RedisCache:
         cls.__rd.hset(target_menu_id, id, pickle.dumps(submenu))
 
         get_menu = cls.__rd.hget(HASH_NAME, target_menu_id)
-        change_menu_count_submenu = pickle.loads(get_menu)  # type: ignore
+        assert isinstance(get_menu, bytes)
+        change_menu_count_submenu = pickle.loads(get_menu)
         change_menu_count_submenu.submenus_count += 1
         cls.__rd.hset(HASH_NAME, target_menu_id, pickle.dumps(change_menu_count_submenu))
 
@@ -106,7 +107,7 @@ class RedisCache:
         return None
 
     @classmethod
-    def delete_submenu(cls, target_menu_id: str, id: str) -> dict[str, str]:
+    def delete_submenu(cls, target_menu_id: str, id: str) -> None:
         """Удалить подменю из кэша redis."""
 
         all_keys_dish = cls.__rd.hkeys(id)
@@ -116,21 +117,22 @@ class RedisCache:
         cls.__rd.hdel(target_menu_id, id)
 
         get_menu = cls.__rd.hget(HASH_NAME, target_menu_id)
-        change_menu_count_submenu = pickle.loads(get_menu)  # type: ignore
+        assert isinstance(get_menu, bytes)
+        change_menu_count_submenu = pickle.loads(get_menu)
         change_menu_count_submenu.submenus_count -= 1
         change_menu_count_submenu.dishes_count = 0
         cls.__rd.hset(HASH_NAME, target_menu_id, pickle.dumps(change_menu_count_submenu))
 
-        return {'message': 'submenu deleted'}
+        return None
 
     @classmethod
-    def get_all_keys_submenu(cls, target_menu_id: str):
+    def get_all_keys_submenu(cls, target_menu_id: str) -> list[str]:
         """Получить все ключи (id) кеша подменю"""
 
         return [i.decode('utf-8') for i in cls.__rd.hkeys(target_menu_id)]
 
     @classmethod
-    def get_all_dish(cls, target_submenu_id: str) -> list[models.Dishes] | None:
+    def get_all_dish(cls, target_submenu_id: str) -> list[models.Dishes] | list[None]:
         """Получить все блюда из кэша redis."""
 
         result = cls.__rd.hvals(target_submenu_id)
@@ -146,12 +148,14 @@ class RedisCache:
         cls.__rd.hset(target_submenu_id, id, pickle.dumps(dish))
 
         get_submenu = cls.__rd.hget(target_menu_id, target_submenu_id)
-        change_submenu_count_dish = pickle.loads(get_submenu)  # type: ignore
+        assert isinstance(get_submenu, bytes)
+        change_submenu_count_dish = pickle.loads(get_submenu)
         change_submenu_count_dish.dishes_count += 1
         cls.__rd.hset(target_menu_id, target_submenu_id, pickle.dumps(change_submenu_count_dish))
 
         get_menu = cls.__rd.hget(HASH_NAME, target_menu_id)
-        change_menu_count_dish = pickle.loads(get_menu)  # type: ignore
+        assert isinstance(get_menu, bytes)
+        change_menu_count_dish = pickle.loads(get_menu)
         change_menu_count_dish.dishes_count += 1
         cls.__rd.hset(HASH_NAME, target_menu_id, pickle.dumps(change_menu_count_dish))
 
@@ -172,25 +176,33 @@ class RedisCache:
         return None
 
     @classmethod
-    def delete_dish(cls, target_menu_id: str, target_submenu_id: str, id: str) -> dict[str, str]:
+    def delete_dish(cls, target_menu_id: str, target_submenu_id: str, id: str) -> None:
         """Удалить бдюдо из кэша redis."""
 
         cls.__rd.hdel(target_submenu_id, id)
 
         get_submenu = cls.__rd.hget(target_menu_id, target_submenu_id)
-        change_submenu_count_dish = pickle.loads(get_submenu)  # type: ignore
+        assert isinstance(get_submenu, bytes)
+        change_submenu_count_dish = pickle.loads(get_submenu)
         change_submenu_count_dish.dishes_count -= 1
         cls.__rd.hset(target_menu_id, target_submenu_id, pickle.dumps(change_submenu_count_dish))
 
         get_menu = cls.__rd.hget(HASH_NAME, target_menu_id)
-        change_menu_count_dish = pickle.loads(get_menu)  # type: ignore
+        assert isinstance(get_menu, bytes)
+        change_menu_count_dish = pickle.loads(get_menu)
         change_menu_count_dish.dishes_count -= 1
         cls.__rd.hset(HASH_NAME, target_menu_id, pickle.dumps(change_menu_count_dish))
 
-        return {'message': 'dish deleted'}
+        return None
 
     @classmethod
-    def get_all_keys_dishes(cls, target_submenu_id: str):
+    def get_all_keys_dishes(cls, target_submenu_id: str) -> list[str]:
         """Получить все ключи (id) кеша блюда"""
 
         return [i.decode('utf-8') for i in cls.__rd.hkeys(target_submenu_id)]
+
+    @classmethod
+    def drob_cache(cls) -> None:
+        """Очищает базу для тестов"""
+
+        cls.__rd.flushall()

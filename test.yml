@@ -7,19 +7,30 @@ services:
     env_file:
       - .env_test_db
     depends_on:
-      - redis
-    command: /bin/bash -c "sleep 15 && pytest -v"
+      test_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["CMD-SHELL", "pytest", "-v"]
 
   test_db:
     image: postgres:15.1-alpine
     container_name: test_db
     env_file:
       - .env_test_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 15s
+      retries: 3
 
   redis:
     image: redis:7
     container_name: redis
     env_file:
       - .env_test_db
-    depends_on:
-      - test_db
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
