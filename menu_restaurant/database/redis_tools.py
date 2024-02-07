@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from menu_restaurant.database import models
 
-load_dotenv('.env.work')
+load_dotenv()
 
 HASH_NAME: str = 'full_menu'
 """Переменная для присвоения имению хэшу"""

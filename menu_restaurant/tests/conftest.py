@@ -12,7 +12,7 @@ from menu_restaurant.database.session import Base
 
 from ..main import app
 
-load_dotenv('.env.work')
+load_dotenv()
 
 TEST_DATABASE_URL = os.getenv('DB_URL')
 
