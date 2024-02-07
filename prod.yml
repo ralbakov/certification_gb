@@ -6,10 +6,10 @@ services:
     env_file:
       - .env_prod
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test: /bin/bash -c "pg_isready"
       interval: 10s
-      timeout: 15s
-      retries: 3
+      timeout: 10s
+      retries: 5
 
   prod_api:
     build:
@@ -34,7 +34,7 @@ services:
     depends_on:
       - prod_db
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli", "ping"]
+      test: /bin/bash -c "redis-cli ping"
       interval: 10s
       timeout: 3s
       retries: 3
