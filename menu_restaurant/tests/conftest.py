@@ -12,9 +12,9 @@ from menu_restaurant.database.session import Base
 
 from ..main import app
 
-load_dotenv()
+load_dotenv('.env.work')
 
-TEST_DATABASE_URL = os.getenv('DB_URL')
+TEST_DATABASE_URL = os.environ['DB_URL']
 
 engine = create_engine(
     TEST_DATABASE_URL,
