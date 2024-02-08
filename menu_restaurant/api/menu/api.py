@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from menu_restaurant.database.dependency import get_db
-from menu_restaurant.database.schemas import Menus, MenusCreate, MenusUpdate
+from menu_restaurant.database.schemas import Menus
 
 from ..menu.service_repository import (
     create_menu_service,
@@ -21,9 +20,8 @@ menu_router = APIRouter(prefix='/api/v1/menus')
                   response_model=Menus,
                   tags=['Menu']
                   )
-async def create_menu(menu: MenusCreate,
-                      db: Session = Depends(get_db)):
-    return create_menu_service(db=db, menu=menu)
+async def create_menu(menu: Session = Depends(create_menu_service)):
+    return menu
 
 
 @menu_router.get('',
@@ -32,8 +30,8 @@ async def create_menu(menu: MenusCreate,
                  status_code=200,
                  tags=['Menu']
                  )
-async def get_all_menu(db: Session = Depends(get_db)):
-    return get_all_menu_service(db=db)
+async def get_all_menu(menu: Session = Depends(get_all_menu_service)):
+    return menu
 
 
 @menu_router.get('/{target_menu_id}',
@@ -42,9 +40,8 @@ async def get_all_menu(db: Session = Depends(get_db)):
                  status_code=200,
                  tags=['Menu']
                  )
-async def get_menu(target_menu_id: str,
-                   db: Session = Depends(get_db)):
-    return get_menu_service(target_menu_id=target_menu_id, db=db)
+async def get_menu(menu: Session = Depends(get_menu_service)):
+    return menu
 
 
 @menu_router.patch('/{target_menu_id}',
@@ -53,13 +50,14 @@ async def get_menu(target_menu_id: str,
                    status_code=200,
                    tags=['Menu']
                    )
-async def update_menu(target_menu_id: str,
-                      menu: MenusUpdate,
-                      db: Session = Depends(get_db)):
-    return update_menu_service(target_menu_id=target_menu_id, menu=menu, db=db)
+async def update_menu(menu: Session = Depends(update_menu_service)):
+    return menu
 
 
-@menu_router.delete('/{target_menu_id}', name='Удаляет меню', tags=['Menu'])
-async def delete_menu(target_menu_id: str,
-                      db: Session = Depends(get_db)):
-    return delete_menu_service(target_menu_id=target_menu_id, db=db)
+@menu_router.delete('/{target_menu_id}',
+                    name='Удаляет меню',
+                    response_model=None,
+                    status_code=200,
+                    tags=['Menu'])
+async def delete_menu(menu: Session = Depends(delete_menu_service)):
+    return menu

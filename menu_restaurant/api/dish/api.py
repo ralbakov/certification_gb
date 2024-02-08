@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from menu_restaurant.database.dependency import get_db
-from menu_restaurant.database.schemas import Dishes, DishesCreate, DishesUpdate
+from menu_restaurant.database.schemas import Dishes
 
 from ..dish.service_repository import (
     create_dish_service,
@@ -19,15 +18,12 @@ dish_router = APIRouter(prefix=('/api/v1/menus'
 
 @dish_router.get('',
                  name='Просматривает список блюд',
+                 status_code=200,
                  response_model=list[Dishes],
                  tags=['Dish']
                  )
-async def get_list_dishes(target_menu_id: str,
-                          target_submenu_id: str,
-                          db: Session = Depends(get_db)):
-    return get_all_dish_service(target_menu_id=target_menu_id,
-                                target_submenu_id=target_submenu_id,
-                                db=db)
+async def get_list_dishes(all_dish: Session = Depends(get_all_dish_service)):
+    return all_dish
 
 
 @dish_router.post('',
@@ -35,29 +31,18 @@ async def get_list_dishes(target_menu_id: str,
                   status_code=201,
                   response_model=Dishes,
                   tags=['Dish'])
-async def create_dishe(target_menu_id: str,
-                       target_submenu_id: str,
-                       dish: DishesCreate,
-                       db: Session = Depends(get_db)):
-    return create_dish_service(target_menu_id=target_menu_id,
-                               target_submenu_id=target_submenu_id,
-                               dish=dish,
-                               db=db)
+async def create_dishe(dish: Session = Depends(create_dish_service)):
+    return dish
 
 
 @dish_router.get('/{target_dish_id}',
                  name='Просматривает определенное блюдо',
+                 status_code=200,
                  response_model=Dishes,
                  tags=['Dish']
                  )
-async def get_dish(target_menu_id: str,
-                   target_submenu_id: str,
-                   target_dish_id: str,
-                   db: Session = Depends(get_db)):
-    return get_dish_service(target_menu_id=target_menu_id,
-                            target_submenu_id=target_submenu_id,
-                            target_dish_id=target_dish_id,
-                            db=db)
+async def get_dish(dish: Session = Depends(get_dish_service)):
+    return dish
 
 
 @dish_router.patch('/{target_dish_id}',
@@ -65,27 +50,13 @@ async def get_dish(target_menu_id: str,
                    response_model=Dishes,
                    tags=['Dish']
                    )
-async def update_dish(target_menu_id: str,
-                      target_submenu_id: str,
-                      target_dish_id: str,
-                      dish: DishesUpdate,
-                      db: Session = Depends(get_db)):
-    return update_dish_service(target_menu_id=target_menu_id,
-                               target_submenu_id=target_submenu_id,
-                               target_dish_id=target_dish_id,
-                               dish=dish,
-                               db=db)
+async def update_dish(dish: Session = Depends(update_dish_service)):
+    return dish
 
 
 @dish_router.delete('/{target_dish_id}',
                     name='Удаляет блюдо',
                     tags=['Dish']
                     )
-async def delete_dish(target_menu_id: str,
-                      target_submenu_id: str,
-                      target_dish_id: str,
-                      db: Session = Depends(get_db)):
-    return delete_dish_service(target_menu_id=target_menu_id,
-                               target_submenu_id=target_submenu_id,
-                               target_dish_id=target_dish_id,
-                               db=db)
+async def delete_dish(dish: Session = Depends(delete_dish_service)):
+    return dish

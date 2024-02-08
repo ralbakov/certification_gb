@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from menu_restaurant.database.dependency import get_db
-from menu_restaurant.database.schemas import Submenus, SubmenusCreate, SubmenusUpdate
+from menu_restaurant.database.schemas import Submenus
 
 from ..submenu.service_repository import (
     create_submenu_service,
@@ -18,12 +17,12 @@ submenu_router = APIRouter(prefix=('/api/v1/menus'
 
 @submenu_router.get('',
                     name='Просматривает список подменю',
+                    status_code=200,
                     response_model=list[Submenus],
                     tags=['Submenu']
                     )
-async def get_list_submenus(target_menu_id: str,
-                            db: Session = Depends(get_db)):
-    return get_all_submenu_service(target_menu_id=target_menu_id, db=db)
+async def get_list_submenus(all_submenu: Session = Depends(get_all_submenu_service)):
+    return all_submenu
 
 
 @submenu_router.post('',
@@ -31,43 +30,28 @@ async def get_list_submenus(target_menu_id: str,
                      status_code=201,
                      response_model=Submenus,
                      tags=['Submenu'])
-async def create_submenu(target_menu_id: str,
-                         submenu: SubmenusCreate,
-                         db: Session = Depends(get_db)):
-    return create_submenu_service(target_menu_id=target_menu_id, submenu=submenu, db=db)
+async def create_submenu(submenu: Session = Depends(create_submenu_service)):
+    return submenu
 
 
 @submenu_router.get('/{target_submenu_id}',
                     name='Просматривает определенное подменю',
+                    status_code=200,
                     response_model=Submenus,
                     tags=['Submenu'])
-async def get_submenu(target_menu_id: str,
-                      target_submenu_id: str,
-                      db: Session = Depends(get_db)):
-    return get_submenu_service(target_menu_id=target_menu_id,
-                               target_submenu_id=target_submenu_id,
-                               db=db)
+async def get_submenu(submenu: Session = Depends(get_submenu_service)):
+    return submenu
 
 
 @submenu_router.patch('/{target_submenu_id}',
                       name='Обновляет подменю',
                       response_model=Submenus,
                       tags=['Submenu'])
-async def update_submenu(target_menu_id: str,
-                         target_submenu_id: str,
-                         submenu: SubmenusUpdate,
-                         db: Session = Depends(get_db)):
-    return update_submenu_service(target_menu_id=target_menu_id,
-                                  target_submenu_id=target_submenu_id,
-                                  submenu=submenu,
-                                  db=db)
+async def update_submenu(submenu: Session = Depends(update_submenu_service)):
+    return submenu
 
 
 @submenu_router.delete('/{target_submenu_id}',
                        name='Удаляет подменю', tags=['Submenu'])
-async def delete_submenu(target_menu_id: str,
-                         target_submenu_id: str,
-                         db: Session = Depends(get_db)):
-    return delete_submenu_service(target_menu_id=target_menu_id,
-                                  target_submenu_id=target_submenu_id,
-                                  db=db)
+async def delete_submenu(submenu: Session = Depends(delete_submenu_service)):
+    return submenu
