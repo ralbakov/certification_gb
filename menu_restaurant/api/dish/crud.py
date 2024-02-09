@@ -14,7 +14,8 @@ def get_dishes(target_menu_id: str,
                ) -> list[Dishes] | list[None]:
     return (
         db.query(Dishes)
-        .filter(Dishes.target_submenu_id == target_submenu_id,
+        .join(Submenus)
+        .filter(Submenus.id == target_submenu_id,
                 Submenus.target_menu_id == target_menu_id
                 )
         .all()
@@ -26,6 +27,7 @@ def create_dish(target_menu_id: str,
                 dish_schema: DishesCreate,
                 db: Session = Depends(get_db)) -> dict | ValueError:
     db_create_dish = (db.query(Dishes)
+                      .join(Submenus)
                       .filter(Submenus.id == target_submenu_id,
                               Submenus.target_menu_id == target_menu_id,
                               Dishes.title == dish_schema.title
@@ -51,12 +53,14 @@ def get_dish(target_menu_id: str,
              target_dish_id: str,
              db: Session = Depends(get_db)) -> Dishes | None:
     db_dish = (db.query(Dishes)
-               .filter(Dishes.id == target_dish_id,
-                       Dishes.target_submenu_id == target_submenu_id,
-                       Submenus.target_menu_id == target_menu_id
-                       )
-               .one_or_none()
-               )
+               .join(Submenus)
+               .filter(
+        Submenus.id == target_submenu_id,
+        Submenus.target_menu_id == target_menu_id,
+        Dishes.id == target_dish_id,
+    )
+        .one_or_none()
+    )
     return db_dish
 
 
@@ -66,8 +70,9 @@ def update_dish(target_menu_id: str,
                 dish_schema: DishesUpdate,
                 db: Session = Depends(get_db)) -> Dishes | None | ValueError:
     db_update_dish = (db.query(Dishes)
+                      .join(Submenus)
                       .filter(Dishes.id == target_dish_id,
-                              Dishes.target_submenu_id == target_submenu_id,
+                              Submenus.id == target_submenu_id,
                               Submenus.target_menu_id == target_menu_id
                               )
                       .one_or_none()
@@ -91,10 +96,11 @@ def delete_dish(target_menu_id: str,
                 db: Session = Depends(get_db)) -> None:
     (
         db.query(Dishes)
-        .filter(Dishes.id == target_dish_id,
-                Dishes.target_submenu_id == target_submenu_id,
-                Submenus.target_menu_id == target_menu_id
-                )
+        .filter(
+            Submenus.id == target_submenu_id,
+            Submenus.target_menu_id == target_menu_id,
+            Dishes.id == target_dish_id,
+        )
         .delete(synchronize_session=False)
     )
     db.commit()

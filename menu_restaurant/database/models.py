@@ -49,6 +49,7 @@ class Menus(Base):
         select(func.count(Submenus.id))
         .where(Submenus.target_menu_id == id)
         .correlate_except(Submenus)
+        .scalar_subquery()
     )
     dishes_count = column_property(
         select(func.count(Dishes.id))

@@ -24,6 +24,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 Base.metadata.drop_all(bind=engine)
+RedisCache.drob_all_cache()
 Base.metadata.create_all(bind=engine)
 
 
@@ -39,4 +40,3 @@ app.dependency_overrides[get_db] = override_get_db
 
 
 client = TestClient(app)
-RedisCache.drob_all_cache()
