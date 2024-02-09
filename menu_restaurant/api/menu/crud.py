@@ -3,7 +3,7 @@ import uuid
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from menu_restaurant.database.dependency import get_db
+from menu_restaurant.api.dependency import get_db
 from menu_restaurant.database.models import Menus
 from menu_restaurant.database.schemas import MenusCreate, MenusUpdate
 

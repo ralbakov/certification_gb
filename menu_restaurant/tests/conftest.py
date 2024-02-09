@@ -6,9 +6,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from menu_restaurant.database.dependency import get_db
+from menu_restaurant.api.dependency import get_db
+from menu_restaurant.database.confdb import Base
 from menu_restaurant.database.redis_tools import RedisCache
-from menu_restaurant.database.session import Base
 
 from ..main import app
 
