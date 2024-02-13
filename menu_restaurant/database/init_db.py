@@ -1,5 +1,5 @@
 from menu_restaurant.database import models
-from menu_restaurant.database.engine import engine
+from menu_restaurant.database.confdb import engine
 
 
 def init_db():

@@ -1,5 +1,4 @@
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
 
 from menu_restaurant.api.submenu.crud import (
     create_submenu,
@@ -13,7 +12,7 @@ from menu_restaurant.database.redis_tools import RedisCache
 
 
 def create_submenu_service(target_menu_id: str,
-                           submenu: Session = Depends(create_submenu)) -> Submenus | HTTPException:
+                           submenu=Depends(create_submenu)) -> Submenus | HTTPException:
     """Создает подменю"""
     if submenu is ValueError:
         raise HTTPException(status_code=409, detail='submenu with title alredy exist')
@@ -25,7 +24,7 @@ def create_submenu_service(target_menu_id: str,
 
 
 def get_all_submenu_service(target_menu_id: str,
-                            submenu: Session = Depends(get_submenus)) -> list[Submenus] | list[None]:
+                            submenu=Depends(get_submenus)) -> list[Submenus] | list[None]:
     """Получает все подменю"""
     get_all_submenu_cache = RedisCache.get_all_submenu_cache(target_menu_id=target_menu_id)
     if get_all_submenu_cache is not None or get_all_submenu_cache == []:
@@ -35,7 +34,7 @@ def get_all_submenu_service(target_menu_id: str,
 
 def get_submenu_service(target_menu_id: str,
                         target_submenu_id: str,
-                        submenu: Session = Depends(get_submenu)) -> Submenus | HTTPException:
+                        submenu=Depends(get_submenu)) -> Submenus | HTTPException:
     """Получает подменю"""
 
     if target_submenu_id in RedisCache.get_all_keys_submenu(target_menu_id=target_menu_id):
@@ -54,7 +53,7 @@ def get_submenu_service(target_menu_id: str,
 
 def update_submenu_service(target_menu_id: str,
                            target_submenu_id: str,
-                           submenu: Session = Depends(update_submenu)) -> Submenus | HTTPException:
+                           submenu=Depends(update_submenu)) -> Submenus | HTTPException:
     """Обновляет подменю"""
 
     if submenu is None:
@@ -70,7 +69,7 @@ def update_submenu_service(target_menu_id: str,
 
 def delete_submenu_service(target_menu_id: str,
                            target_submenu_id: str,
-                           submenu: Session = Depends(delete_submenu)) -> None:
+                           submenu=Depends(delete_submenu)) -> None:
     """Удаляет подменю"""
 
     RedisCache.delete_submenu_cache(target_menu_id=target_menu_id,

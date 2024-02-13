@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
 from menu_restaurant.database.schemas import Submenus
 
@@ -21,7 +20,7 @@ submenu_router = APIRouter(prefix=('/api/v1/menus'
                     response_model=list[Submenus],
                     tags=['Submenu']
                     )
-async def get_list_submenus(all_submenu: Session = Depends(get_all_submenu_service)):
+async def get_list_submenus(all_submenu=Depends(get_all_submenu_service)):
     return all_submenu
 
 
@@ -30,7 +29,7 @@ async def get_list_submenus(all_submenu: Session = Depends(get_all_submenu_servi
                      status_code=201,
                      response_model=Submenus,
                      tags=['Submenu'])
-async def create_submenu(submenu: Session = Depends(create_submenu_service)):
+async def create_submenu(submenu=Depends(create_submenu_service)):
     return submenu
 
 
@@ -39,7 +38,7 @@ async def create_submenu(submenu: Session = Depends(create_submenu_service)):
                     status_code=200,
                     response_model=Submenus,
                     tags=['Submenu'])
-async def get_submenu(submenu: Session = Depends(get_submenu_service)):
+async def get_submenu(submenu=Depends(get_submenu_service)):
     return submenu
 
 
@@ -47,11 +46,11 @@ async def get_submenu(submenu: Session = Depends(get_submenu_service)):
                       name='Обновляет подменю',
                       response_model=Submenus,
                       tags=['Submenu'])
-async def update_submenu(submenu: Session = Depends(update_submenu_service)):
+async def update_submenu(submenu=Depends(update_submenu_service)):
     return submenu
 
 
 @submenu_router.delete('/{target_submenu_id}',
                        name='Удаляет подменю', tags=['Submenu'])
-async def delete_submenu(submenu: Session = Depends(delete_submenu_service)):
+async def delete_submenu(submenu=Depends(delete_submenu_service)):
     return submenu

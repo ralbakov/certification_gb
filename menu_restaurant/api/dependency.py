@@ -1,4 +1,4 @@
-from menu_restaurant.database.session import SessionLocal
+from menu_restaurant.database.confdb import SessionLocal
 
 
 def get_db():

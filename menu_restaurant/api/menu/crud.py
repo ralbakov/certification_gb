@@ -24,10 +24,6 @@ def get_menu(target_menu_id: str,
 def create_menu(menu_schema: MenusCreate,
                 db: Session = Depends(get_db)
                 ) -> dict | ValueError:
-    if (db.query(Menus)
-            .filter(Menus.title == menu_schema.title)
-            .one_or_none()) is not None:
-        raise ValueError
     menu = Menus(id=str(uuid.uuid4()),
                  title=menu_schema.title,
                  description=menu_schema.description
@@ -48,14 +44,19 @@ def update_menu(target_menu_id: str,
             )
     if menu is None:
         return None
-    if menu.title == menu_schema.title:
-        raise ValueError
-    menu.title = menu_schema.title
-    menu.description = menu_schema.description
-    db.add(menu)
-    db.commit()
-    db.refresh(menu)
-    return menu
+    try:
+        if menu.title == menu_schema.title:
+            raise ValueError('Menu with title alredy exist')
+    except ValueError:
+        menu = ValueError
+        return menu
+    else:
+        menu.title = menu_schema.title
+        menu.description = menu_schema.description
+        db.add(menu)
+        db.commit()
+        db.refresh(menu)
+        return menu
 
 
 def delete_menu(target_menu_id: str, db: Session = Depends(get_db)) -> None:

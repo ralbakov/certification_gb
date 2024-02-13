@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from menu_restaurant.api.dish.api import dish_router
 from menu_restaurant.api.menu.api import menu_router
 from menu_restaurant.api.submenu.api import submenu_router
-from menu_restaurant.database.init import init_db
+from menu_restaurant.database.init_db import init_db
 
 app = FastAPI(title='Restaurante API',
               description=('Приложение для работы с меню ресторана, '

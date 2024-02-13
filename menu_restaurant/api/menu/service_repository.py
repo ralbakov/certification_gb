@@ -1,5 +1,4 @@
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
 
 from menu_restaurant.api.menu.crud import (
     create_menu,
@@ -12,15 +11,13 @@ from menu_restaurant.database.models import Menus
 from menu_restaurant.database.redis_tools import RedisCache
 
 
-def create_menu_service(menu: Session = Depends(create_menu)) -> Menus | HTTPException:
+def create_menu_service(menu=Depends(create_menu)) -> Menus:
     """Создает меню"""
-    if menu is ValueError:
-        raise HTTPException(status_code=409, detail='menu with title alredy exist')
     RedisCache.set_menu_cache(target_menu_id=menu['target_menu_id'], menu=menu['menu'])
     return menu['menu']
 
 
-def get_all_menu_service(menu: Session = Depends(get_menus)) -> list[Menus] | list[None]:
+def get_all_menu_service(menu=Depends(get_menus)) -> list[Menus] | list[None]:
     """Получает все меню"""
 
     get_all_menu_cache = RedisCache.get_all_menu_cache()
@@ -30,7 +27,7 @@ def get_all_menu_service(menu: Session = Depends(get_menus)) -> list[Menus] | li
 
 
 def get_menu_service(target_menu_id: str,
-                     menu: Session = Depends(get_menu)) -> Menus | HTTPException:
+                     menu=Depends(get_menu)) -> Menus | HTTPException:
     """Получает меню"""
 
     if target_menu_id in RedisCache.get_all_keys_menu():
@@ -43,7 +40,7 @@ def get_menu_service(target_menu_id: str,
 
 
 def update_menu_service(target_menu_id: str,
-                        menu: Session = Depends(update_menu)) -> Menus | HTTPException:
+                        menu=Depends(update_menu)) -> Menus | HTTPException:
     """Обновляет меню"""
 
     if menu is None:
@@ -55,7 +52,7 @@ def update_menu_service(target_menu_id: str,
 
 
 def delete_menu_service(target_menu_id: str,
-                        menu: Session = Depends(delete_menu)) -> None:
+                        menu=Depends(delete_menu)) -> None:
     """Удаляет меню"""
 
     RedisCache.delete_menu_cache(target_menu_id=target_menu_id)
