@@ -12,7 +12,7 @@ from menu_restaurant.database.redis_tools import RedisCache
 
 from ..main import app
 
-load_dotenv('.env.work')
+load_dotenv()
 
 TEST_DATABASE_URL = os.environ['DB_URL_TEST']
 

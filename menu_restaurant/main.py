@@ -5,6 +5,8 @@ from menu_restaurant.api.menu.api import menu_router
 from menu_restaurant.api.submenu.api import submenu_router
 from menu_restaurant.database.init_db import init_db
 
+init_db()
+
 app = FastAPI(title='Restaurante API',
               description=('Приложение для работы с меню ресторана, '
                            'включая работу с подменю и блюдами'),
@@ -29,6 +31,3 @@ app = FastAPI(title='Restaurante API',
 app.include_router(menu_router)
 app.include_router(submenu_router)
 app.include_router(dish_router)
-
-if __name__ == '__main__':
-    init_db()
