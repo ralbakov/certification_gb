@@ -21,7 +21,7 @@ dish_router = APIRouter(prefix=('/api/v1/menus'
                  response_model=list[Dishes],
                  tags=['Dish']
                  )
-async def get_list_dishes(all_dish=Depends(get_all_dish_service)):
+async def get_list_dishes(all_dish=Depends(get_all_dish_service)) -> list[Dishes] | list[None]:
     return all_dish
 
 
@@ -30,7 +30,7 @@ async def get_list_dishes(all_dish=Depends(get_all_dish_service)):
                   status_code=201,
                   response_model=Dishes,
                   tags=['Dish'])
-async def create_dishe(dish=Depends(create_dish_service)):
+async def create_dishe(dish=Depends(create_dish_service)) -> Dishes:
     return dish
 
 
@@ -40,7 +40,7 @@ async def create_dishe(dish=Depends(create_dish_service)):
                  response_model=Dishes,
                  tags=['Dish']
                  )
-async def get_dish(dish=Depends(get_dish_service)):
+async def get_dish(dish=Depends(get_dish_service)) -> Dishes:
     return dish
 
 
@@ -49,7 +49,7 @@ async def get_dish(dish=Depends(get_dish_service)):
                    response_model=Dishes,
                    tags=['Dish']
                    )
-async def update_dish(dish=Depends(update_dish_service)):
+async def update_dish(dish=Depends(update_dish_service)) -> Dishes:
     return dish
 
 
@@ -57,5 +57,5 @@ async def update_dish(dish=Depends(update_dish_service)):
                     name='Удаляет блюдо',
                     tags=['Dish']
                     )
-async def delete_dish(dish=Depends(delete_dish_service)):
+async def delete_dish(dish=Depends(delete_dish_service)) -> None:
     return dish

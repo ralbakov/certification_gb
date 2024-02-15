@@ -14,7 +14,7 @@ from ..main import app
 
 load_dotenv('.env.work')
 
-TEST_DATABASE_URL = os.environ['DB_URL']
+TEST_DATABASE_URL = os.environ['DB_URL_TEST']
 
 engine = create_engine(
     TEST_DATABASE_URL,

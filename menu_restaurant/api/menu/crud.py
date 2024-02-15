@@ -45,8 +45,8 @@ def update_menu(target_menu_id: str,
     if menu is None:
         return None
     try:
-        if menu.title == menu_schema.title:
-            raise ValueError('Menu with title alredy exist')
+        if menu.title == menu_schema.title and menu.description == menu_schema.description:
+            raise ValueError('menu not update')
     except ValueError:
         menu = ValueError
         return menu

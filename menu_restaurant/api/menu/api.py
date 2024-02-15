@@ -19,7 +19,7 @@ menu_router = APIRouter(prefix='/api/v1/menus')
                   response_model=Menus,
                   tags=['Menu'],
                   )
-async def create_menu(menu=Depends(create_menu_service)):
+async def create_menu(menu=Depends(create_menu_service)) -> Menus:
     return menu
 
 
@@ -29,7 +29,7 @@ async def create_menu(menu=Depends(create_menu_service)):
                  status_code=200,
                  tags=['Menu']
                  )
-async def get_all_menu(menu=Depends(get_all_menu_service)):
+async def get_all_menu(menu=Depends(get_all_menu_service)) -> list[Menus] | list[None]:
     return menu
 
 
@@ -39,7 +39,7 @@ async def get_all_menu(menu=Depends(get_all_menu_service)):
                  status_code=200,
                  tags=['Menu']
                  )
-async def get_menu(menu=Depends(get_menu_service)):
+async def get_menu(menu=Depends(get_menu_service)) -> Menus:
     return menu
 
 
@@ -49,7 +49,7 @@ async def get_menu(menu=Depends(get_menu_service)):
                    status_code=200,
                    tags=['Menu']
                    )
-async def update_menu(menu=Depends(update_menu_service)):
+async def update_menu(menu=Depends(update_menu_service)) -> Menus:
     return menu
 
 
@@ -58,5 +58,5 @@ async def update_menu(menu=Depends(update_menu_service)):
                     response_model=None,
                     status_code=200,
                     tags=['Menu'])
-async def delete_menu(menu=Depends(delete_menu_service)):
+async def delete_menu(menu=Depends(delete_menu_service)) -> None:
     return menu
