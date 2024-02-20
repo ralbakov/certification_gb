@@ -1,66 +1,53 @@
-import uuid
-
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from menu_restaurant.database.dependency import get_db
 from menu_restaurant.database.models import Submenus
 from menu_restaurant.database.schemas import SubmenusCreate, SubmenusUpdate
 
 
-def get_submenus(target_menu_id: str,
-                 db: Session = Depends(get_db)
-                 ) -> list[Submenus] | list[None]:
-    return (
-        db.query(Submenus)
-        .filter(Submenus.target_menu_id == target_menu_id).all()
-    )
+async def get_submenus(target_menu_id: str,
+                       db: AsyncSession = Depends(get_db)
+                       ) -> list[Submenus] | list[None]:
+    submenu = await db.execute(select(Submenus)
+                               .filter(Submenus.target_menu_id == target_menu_id))
+    return submenu.all()
 
 
-def create_submenu(target_menu_id: str,
-                   submenu: SubmenusCreate,
-                   db: Session = Depends(get_db),
-                   ) -> dict | ValueError:
-    if (db.query(Submenus)
-            .filter(Submenus.target_menu_id == target_menu_id,
-                    Submenus.title == submenu.title)
+async def create_submenu(target_menu_id: str,
+                         submenu: SubmenusCreate,
+                         db: AsyncSession = Depends(get_db),
+                         ) -> dict | ValueError:
+    if ((await (db.execute(select(Submenus)
+                           .filter(Submenus.target_menu_id == target_menu_id,
+                                   Submenus.title == submenu.title))))
             .one_or_none()) is not None:
         raise ValueError
-    db_submenu = (Submenus(target_menu_id=target_menu_id,
-                           id=str(uuid.uuid4()),
-                           title=submenu.title,
-                           description=submenu.description
-                           )
-                  )
-    db.add(db_submenu)
-    db.commit()
-    db.refresh(db_submenu)
-    return {'target_submenu_id': str(db_submenu.id), 'submenu': db_submenu}
+    submenu = (Submenus(target_menu_id=target_menu_id,
+                        title=submenu.title,
+                        description=submenu.description
+                        )
+               )
+    db.add(submenu)
+    await db.commit()
+    await db.refresh(submenu)
+    return {'target_submenu_id': str(submenu.id), 'submenu': submenu}
 
 
-def get_submenu(target_menu_id: str,
-                target_submenu_id: str,
-                db: Session = Depends(get_db)
-                ) -> Submenus | None:
-    db_submenu = (db.query(Submenus)
-                  .filter(Submenus.target_menu_id == target_menu_id,
-                          Submenus.id == target_submenu_id)
-                  .one_or_none()
-                  )
-    return db_submenu
+async def get_submenu(target_menu_id: str,
+                      target_submenu_id: str,
+                      db: AsyncSession = Depends(get_db)
+                      ) -> Submenus | None:
+    submenu = await db.get(Submenus, target_submenu_id)
+    return submenu
 
 
-def update_submenu(target_menu_id: str,
-                   target_submenu_id: str,
-                   submenu: SubmenusUpdate,
-                   db: Session = Depends(get_db)) -> Submenus | None | ValueError:
-    db_update_submenu = (
-        db.query(Submenus)
-        .filter(Submenus.target_menu_id == target_menu_id,
-                Submenus.id == target_submenu_id
-                )
-        .one_or_none()
-    )
+async def update_submenu(target_menu_id: str,
+                         target_submenu_id: str,
+                         submenu: SubmenusUpdate,
+                         db: AsyncSession = Depends(get_db)) -> Submenus | None | ValueError:
+    db_update_submenu = await db.get(Submenus, target_submenu_id)
     if db_update_submenu is None:
         return None
     if db_update_submenu.title == submenu.title:
@@ -68,20 +55,15 @@ def update_submenu(target_menu_id: str,
     db_update_submenu.title = submenu.title
     db_update_submenu.description = submenu.description
     db.add(db_update_submenu)
-    db.commit()
-    db.refresh(db_update_submenu)
+    await db.commit()
+    await db.refresh(db_update_submenu)
     return db_update_submenu
 
 
-def delete_submenu(target_menu_id: str,
-                   target_submenu_id: str,
-                   db: Session = Depends(get_db)) -> None:
-    (
-        db.query(Submenus)
-        .filter(Submenus.target_menu_id == target_menu_id,
-                Submenus.id == target_submenu_id
-                )
-        .delete(synchronize_session=False)
-    )
-    db.commit()
+async def delete_submenu(target_menu_id: str,
+                         target_submenu_id: str,
+                         db: AsyncSession = Depends(get_db)) -> None:
+    submenu = await db.get(Submenus, target_submenu_id)
+    await db.delete(submenu)
+    await db.commit()
     return None

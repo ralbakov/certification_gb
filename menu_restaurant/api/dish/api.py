@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from menu_restaurant.database.schemas import Dishes
 
@@ -22,7 +22,7 @@ dish_router = APIRouter(prefix=('/api/v1/menus'
                  response_model=list[Dishes],
                  tags=['Dish']
                  )
-async def get_list_dishes(all_dish: Session = Depends(get_all_dish_service)):
+async def get_list_dishes(all_dish: AsyncSession = Depends(get_all_dish_service)):
     return all_dish
 
 
@@ -31,7 +31,7 @@ async def get_list_dishes(all_dish: Session = Depends(get_all_dish_service)):
                   status_code=201,
                   response_model=Dishes,
                   tags=['Dish'])
-async def create_dishe(dish: Session = Depends(create_dish_service)):
+async def create_dishe(dish: AsyncSession = Depends(create_dish_service)):
     return dish
 
 
@@ -41,7 +41,7 @@ async def create_dishe(dish: Session = Depends(create_dish_service)):
                  response_model=Dishes,
                  tags=['Dish']
                  )
-async def get_dish(dish: Session = Depends(get_dish_service)):
+async def get_dish(dish: AsyncSession = Depends(get_dish_service)):
     return dish
 
 
@@ -50,7 +50,7 @@ async def get_dish(dish: Session = Depends(get_dish_service)):
                    response_model=Dishes,
                    tags=['Dish']
                    )
-async def update_dish(dish: Session = Depends(update_dish_service)):
+async def update_dish(dish: AsyncSession = Depends(update_dish_service)):
     return dish
 
 
@@ -58,5 +58,5 @@ async def update_dish(dish: Session = Depends(update_dish_service)):
                     name='Удаляет блюдо',
                     tags=['Dish']
                     )
-async def delete_dish(dish: Session = Depends(delete_dish_service)):
+async def delete_dish(dish: AsyncSession = Depends(delete_dish_service)):
     return dish

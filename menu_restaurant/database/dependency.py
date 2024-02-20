@@ -1,9 +1,6 @@
-from menu_restaurant.database.session import SessionLocal
+from menu_restaurant.database.session import AsyncSessionLocal
 
 
-def get_db():
-    db = SessionLocal()
-    try:
+async def get_db():
+    async with AsyncSessionLocal() as db:
         yield db
-    finally:
-        db.close()

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from menu_restaurant.database.schemas import Menus
 
@@ -20,7 +20,7 @@ menu_router = APIRouter(prefix='/api/v1/menus')
                   response_model=Menus,
                   tags=['Menu']
                   )
-async def create_menu(menu: Session = Depends(create_menu_service)):
+async def create_menu(menu: AsyncSession = Depends(create_menu_service)):
     return menu
 
 
@@ -30,7 +30,7 @@ async def create_menu(menu: Session = Depends(create_menu_service)):
                  status_code=200,
                  tags=['Menu']
                  )
-async def get_all_menu(menu: Session = Depends(get_all_menu_service)):
+async def get_all_menu(menu: AsyncSession = Depends(get_all_menu_service)):
     return menu
 
 
@@ -40,7 +40,7 @@ async def get_all_menu(menu: Session = Depends(get_all_menu_service)):
                  status_code=200,
                  tags=['Menu']
                  )
-async def get_menu(menu: Session = Depends(get_menu_service)):
+async def get_menu(menu: AsyncSession = Depends(get_menu_service)):
     return menu
 
 
@@ -50,7 +50,7 @@ async def get_menu(menu: Session = Depends(get_menu_service)):
                    status_code=200,
                    tags=['Menu']
                    )
-async def update_menu(menu: Session = Depends(update_menu_service)):
+async def update_menu(menu: AsyncSession = Depends(update_menu_service)):
     return menu
 
 
@@ -59,5 +59,5 @@ async def update_menu(menu: Session = Depends(update_menu_service)):
                     response_model=None,
                     status_code=200,
                     tags=['Menu'])
-async def delete_menu(menu: Session = Depends(delete_menu_service)):
+async def delete_menu(menu: AsyncSession = Depends(delete_menu_service)):
     return menu

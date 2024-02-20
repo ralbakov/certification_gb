@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from menu_restaurant.api.menu.crud import (
     create_menu,
@@ -12,51 +12,51 @@ from menu_restaurant.database.models import Menus
 from menu_restaurant.database.redis_tools import RedisCache
 
 
-def create_menu_service(menu: Session = Depends(create_menu)) -> Menus | HTTPException:
+async def create_menu_service(menu: AsyncSession = Depends(create_menu)) -> Menus | HTTPException:
     """Создает меню"""
     if menu is ValueError:
         raise HTTPException(status_code=409, detail='menu with title alredy exist')
-    RedisCache.set_menu_cache(target_menu_id=menu['target_menu_id'], menu=menu['menu'])
+    await RedisCache.set_menu_cache(target_menu_id=menu['target_menu_id'], menu=menu['menu'])
     return menu['menu']
 
 
-def get_all_menu_service(menu: Session = Depends(get_menus)) -> list[Menus] | list[None]:
+async def get_all_menu_service(menu: AsyncSession = Depends(get_menus)) -> list[Menus] | list[None]:
     """Получает все меню"""
 
-    get_all_menu_cache = RedisCache.get_all_menu_cache()
+    get_all_menu_cache = await RedisCache.get_all_menu_cache()
     if get_all_menu_cache is not None or get_all_menu_cache == []:
         return get_all_menu_cache
     return menu
 
 
-def get_menu_service(target_menu_id: str,
-                     menu: Session = Depends(get_menu)) -> Menus | HTTPException:
+async def get_menu_service(target_menu_id: str,
+                           menu: AsyncSession = Depends(get_menu)) -> Menus | HTTPException:
     """Получает меню"""
 
-    if target_menu_id in RedisCache.get_all_keys_menu():
-        get_menu_cache = RedisCache.get_menu_cache(target_menu_id=target_menu_id)
+    if target_menu_id in await RedisCache.get_all_keys_menu():
+        get_menu_cache = await RedisCache.get_menu_cache(target_menu_id=target_menu_id)
         return get_menu_cache
     if menu is None:
         raise HTTPException(status_code=404, detail='menu not found')
-    RedisCache.set_menu_cache(target_menu_id=target_menu_id, menu=menu)
+    await RedisCache.set_menu_cache(target_menu_id=target_menu_id, menu=menu)
     return menu
 
 
-def update_menu_service(target_menu_id: str,
-                        menu: Session = Depends(update_menu)) -> Menus | HTTPException:
+async def update_menu_service(target_menu_id: str,
+                              menu: AsyncSession = Depends(update_menu)) -> Menus | HTTPException:
     """Обновляет меню"""
 
     if menu is None:
         raise HTTPException(status_code=404, detail='menu not found')
     elif menu is ValueError:
         raise HTTPException(status_code=409, detail='menu with title alredy exist')
-    RedisCache.update_menu_cache(target_menu_id=target_menu_id, menu=menu)
+    await RedisCache.update_menu_cache(target_menu_id=target_menu_id, menu=menu)
     return menu
 
 
-def delete_menu_service(target_menu_id: str,
-                        menu: Session = Depends(delete_menu)) -> None:
+async def delete_menu_service(target_menu_id: str,
+                              menu: AsyncSession = Depends(delete_menu)) -> None:
     """Удаляет меню"""
 
-    RedisCache.delete_menu_cache(target_menu_id=target_menu_id)
+    await RedisCache.delete_menu_cache(target_menu_id=target_menu_id)
     return menu

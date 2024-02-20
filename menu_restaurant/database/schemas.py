@@ -23,7 +23,7 @@ class Dishes(DishesBase):
     target_submenu_id: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SubmenusBase(BaseModel):
@@ -45,7 +45,7 @@ class Submenus(SubmenusBase):
     dishes_count: StrictInt
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MenusBase(BaseModel):
@@ -67,4 +67,4 @@ class Menus(MenusBase):
     dishes_count: StrictInt
 
     class Config:
-        orm_mode = True
+        from_attributes = True
