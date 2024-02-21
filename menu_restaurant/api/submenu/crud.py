@@ -8,7 +8,7 @@ from menu_restaurant.database.schemas import SubmenusCreate, SubmenusUpdate
 
 
 async def get_submenus(target_menu_id: str,
-                       db: AsyncSession = Depends(get_db)
+                       db: AsyncSession = Depends(get_db),
                        ) -> list[Submenus] | list[None]:
     submenu = await db.execute(select(Submenus)
                                .filter(Submenus.target_menu_id == target_menu_id))
@@ -18,12 +18,7 @@ async def get_submenus(target_menu_id: str,
 async def create_submenu(target_menu_id: str,
                          submenu: SubmenusCreate,
                          db: AsyncSession = Depends(get_db),
-                         ) -> dict | ValueError:
-    if ((await (db.execute(select(Submenus)
-                           .filter(Submenus.target_menu_id == target_menu_id,
-                                   Submenus.title == submenu.title))))
-            .one_or_none()) is not None:
-        raise ValueError
+                         ) -> dict[str, str]:
     submenu = (Submenus(target_menu_id=target_menu_id,
                         title=submenu.title,
                         description=submenu.description
@@ -35,23 +30,19 @@ async def create_submenu(target_menu_id: str,
     return {'target_submenu_id': str(submenu.id), 'submenu': submenu}
 
 
-async def get_submenu(target_menu_id: str,
-                      target_submenu_id: str,
-                      db: AsyncSession = Depends(get_db)
+async def get_submenu(target_submenu_id: str,
+                      db: AsyncSession = Depends(get_db),
                       ) -> Submenus | None:
     submenu = await db.get(Submenus, target_submenu_id)
     return submenu
 
 
-async def update_submenu(target_menu_id: str,
-                         target_submenu_id: str,
+async def update_submenu(target_submenu_id: str,
                          submenu: SubmenusUpdate,
-                         db: AsyncSession = Depends(get_db)) -> Submenus | None | ValueError:
+                         db: AsyncSession = Depends(get_db)) -> Submenus | None:
     db_update_submenu = await db.get(Submenus, target_submenu_id)
     if db_update_submenu is None:
         return None
-    if db_update_submenu.title == submenu.title:
-        raise ValueError
     db_update_submenu.title = submenu.title
     db_update_submenu.description = submenu.description
     db.add(db_update_submenu)
@@ -60,8 +51,7 @@ async def update_submenu(target_menu_id: str,
     return db_update_submenu
 
 
-async def delete_submenu(target_menu_id: str,
-                         target_submenu_id: str,
+async def delete_submenu(target_submenu_id: str,
                          db: AsyncSession = Depends(get_db)) -> None:
     submenu = await db.get(Submenus, target_submenu_id)
     await db.delete(submenu)

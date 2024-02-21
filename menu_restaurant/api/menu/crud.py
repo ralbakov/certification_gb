@@ -21,10 +21,6 @@ async def get_menu(target_menu_id: str,
 async def create_menu(menu_schema: MenusCreate,
                       db: AsyncSession = Depends(get_db)
                       ) -> dict | ValueError:
-    if ((await (db.execute(select(Menus)
-                           .filter(Menus.title == menu_schema.title))))
-            .one_or_none()) is not None:
-        raise ValueError
     menu = Menus(title=menu_schema.title,
                  description=menu_schema.description)
     db.add(menu)
@@ -36,12 +32,10 @@ async def create_menu(menu_schema: MenusCreate,
 async def update_menu(target_menu_id: str,
                       menu_schema: MenusUpdate,
                       db: AsyncSession = Depends(get_db),
-                      ) -> Menus | None | ValueError:
+                      ) -> Menus | None:
     menu = await db.get(Menus, target_menu_id)
     if menu is None:
         return None
-    if menu.title == menu_schema.title:
-        raise ValueError
     menu.title = menu_schema.title
     menu.description = menu_schema.description
     db.add(menu)
