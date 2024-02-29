@@ -5,6 +5,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.util import deprecations
 
 from menu_restaurant.database.dependency import get_db
 
@@ -25,6 +26,8 @@ TestingSessionLocal = sessionmaker(bind=engine,
                                    class_=AsyncSession,
                                    autoflush=False,
                                    autocommit=False)
+
+deprecations.SILENCE_UBER_WARNING = True
 
 
 async def override_get_db():

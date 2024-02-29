@@ -4,8 +4,12 @@ from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.util import deprecations
 
 load_dotenv('.env.work')
+
+deprecations.SILENCE_UBER_WARNING = True
+
 
 SQLALCHEMY_DATABASE_URL = os.getenv('DB_URL')
 
