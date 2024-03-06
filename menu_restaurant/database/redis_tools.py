@@ -26,7 +26,7 @@ class RedisCache:
         if result:
             all_menu = [pickle.loads(item_menu) for item_menu in result]
             return all_menu
-        return []
+        return result
 
     @classmethod
     async def set_menu_cache(cls,
@@ -85,7 +85,7 @@ class RedisCache:
         if result:
             all_submenu = [pickle.loads(item_submenu) for item_submenu in result]
             return all_submenu
-        return []
+        return result
 
     @classmethod
     async def set_submenu_cache(cls,
@@ -158,7 +158,7 @@ class RedisCache:
 
     @classmethod
     async def get_all_keys_submenu(cls, target_menu_id: str) -> list[str]:
-        """Получить все ключи (target_menu_id) кеша подменю"""
+        """Получить все ключи (target_submenu_id) кеша подменю"""
 
         return [i.decode('utf-8') for i in await cls.__rd.hkeys(target_menu_id)]
 
@@ -258,7 +258,7 @@ class RedisCache:
 
     @classmethod
     async def get_all_keys_dishes(cls, target_submenu_id: str) -> list[str]:
-        """Получить все ключи (target_submenu_id) кеша блюда"""
+        """Получить все ключи (target_menu_id) кеша блюда"""
 
         return [i.decode('utf-8') for i in await cls.__rd.hkeys(target_submenu_id)]
 

@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import UUID4, BaseModel, Field, StrictInt, StrictStr
+from pydantic import UUID4, BaseModel, ConfigDict, Field, StrictInt, StrictStr
 from typing_extensions import Annotated
 
 
@@ -19,11 +19,13 @@ class DishesUpdate(DishesBase):
 
 
 class Dishes(DishesBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID4
     target_submenu_id: UUID4
 
-    class Config:
-        from_attributes = True
+    # class ConfigDict:
+    #     from_attributes = True
 
 
 class SubmenusBase(BaseModel):
@@ -40,12 +42,14 @@ class SubmenusUpdate(SubmenusBase):
 
 
 class Submenus(SubmenusBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID4
     target_menu_id: UUID4
     dishes_count: StrictInt
 
-    class Config:
-        from_attributes = True
+    # class ConfigDict:
+    #     from_attributes = True
 
 
 class MenusBase(BaseModel):
@@ -62,9 +66,11 @@ class MenusUpdate(MenusBase):
 
 
 class Menus(MenusBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID4
     submenus_count: StrictInt
     dishes_count: StrictInt
 
-    class Config:
-        from_attributes = True
+    # class ConfigDict:
+    #     from_attributes = True
