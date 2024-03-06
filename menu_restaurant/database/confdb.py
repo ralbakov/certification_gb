@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.util import deprecations
 
-load_dotenv('.env.work')
+load_dotenv()
 
 deprecations.SILENCE_UBER_WARNING = True
 

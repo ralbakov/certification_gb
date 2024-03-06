@@ -13,7 +13,7 @@ from menu_restaurant.database.confdb import Base, get_db
 
 from ..main import app
 
-load_dotenv('env.work')
+load_dotenv()
 
 deprecations.SILENCE_UBER_WARNING = True
 
