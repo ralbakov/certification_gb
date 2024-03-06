@@ -1,13 +1,14 @@
-from ..tests.conftest import client
+from httpx import AsyncClient
+
 from ..tests.reverse import reverse
 
 save_data = {}
 
 
-def test_create_menu():
+async def test_create_menu(ac_client: AsyncClient):
     """Тестирует создание меню."""
 
-    response = client.post(
+    response = await ac_client.post(
         reverse('Создает меню'),
         json={
             'title': 'My menu 1',
@@ -23,11 +24,11 @@ def test_create_menu():
     assert data['id'] == save_data['id']
 
 
-def test_get_empty_submenus():
+async def test_get_empty_submenus(ac_client: AsyncClient):
     """Тестирует пустой список субменю."""
 
     target_menu_id = save_data['id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает список подменю',
                 **{'target_menu_id': target_menu_id})
     )
@@ -37,11 +38,11 @@ def test_get_empty_submenus():
     assert data == []
 
 
-def test_create_submenu():
+async def test_create_submenu(ac_client: AsyncClient):
     """Тестирует создание субменю."""
 
     target_menu_id = save_data['id']
-    response = client.post(
+    response = await ac_client.post(
         reverse('Создает подменю',
                 **{'target_menu_id': target_menu_id}),
         json={
@@ -58,11 +59,11 @@ def test_create_submenu():
     assert data['id'] == save_data['sub_id']
 
 
-def test_get_submenus():
+async def test_get_submenus(ac_client: AsyncClient):
     """Тестирует непустой список субменю."""
 
     target_menu_id = save_data['id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает список подменю',
                 **{'target_menu_id': target_menu_id}),
     )
@@ -72,12 +73,12 @@ def test_get_submenus():
     assert data != []
 
 
-def test_get_one_submenu():
+async def test_get_one_submenu(ac_client: AsyncClient):
     """Тестирует просмотр субменю."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает определенное подменю',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id})
@@ -90,12 +91,12 @@ def test_get_one_submenu():
     assert data['id'] == target_submenu_id
 
 
-def test_update_submenu():
+async def test_update_submenu(ac_client: AsyncClient):
     """Тестирует обновление субменю."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.patch(
+    response = await ac_client.patch(
         reverse('Обновляет подменю',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}),
@@ -112,12 +113,12 @@ def test_update_submenu():
     assert data['id'] == target_submenu_id
 
 
-def test_delete_submenu():
+async def test_delete_submenu(ac_client: AsyncClient):
     """Тестирует удаление субменю."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.delete(
+    response = await ac_client.delete(
         reverse('Удаляет подменю',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}
@@ -127,12 +128,12 @@ def test_delete_submenu():
     assert response.status_code == 200, response.text
 
 
-def test_get_submenu_deleted():
+async def test_get_submenu_deleted(ac_client: AsyncClient):
     """Тестирует просмотр удаленного субменю."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает определенное подменю',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}),
@@ -142,11 +143,11 @@ def test_get_submenu_deleted():
     assert response.json()['detail'] == 'submenu not found'
 
 
-def test_delete_menu():
+async def test_delete_menu(ac_client: AsyncClient):
     """Тестирует удаление меню."""
 
     target_menu_id = save_data['id']
-    response = client.delete(
+    response = await ac_client.delete(
         reverse('Удаляет меню',
                 **{'target_menu_id': target_menu_id})
     )

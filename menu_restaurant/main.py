@@ -1,13 +1,21 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from menu_restaurant.api.dish.api import dish_router
 from menu_restaurant.api.menu.api import menu_router
 from menu_restaurant.api.submenu.api import submenu_router
-from menu_restaurant.database.init_db import init_db
+from menu_restaurant.database.confdb import init_db
 
-init_db()
 
-app = FastAPI(title='Restaurante API',
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan,
+              title='Restaurante API',
               description=('Приложение для работы с меню ресторана, '
                            'включая работу с подменю и блюдами'),
               version='3.0',

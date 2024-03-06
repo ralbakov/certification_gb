@@ -1,19 +1,21 @@
-from ..tests.conftest import client
+from httpx import AsyncClient
+
 from ..tests.reverse import reverse
 
 save_data = {}
 
 
-def test_create_menu():
+async def test_create_menu(ac_client: AsyncClient):
     """Тестирует создание меню."""
 
-    response = client.post(
-        reverse('Создает меню'),
+    response = await ac_client.post(
+        url=reverse('Создает меню'),
         json={
             'title': 'My menu 1',
             'description': 'My menu description 1'
         }
     )
+
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
     assert response.status_code == 201, response.text
     data = response.json()
@@ -23,11 +25,11 @@ def test_create_menu():
     assert data['id'] == save_data['id']
 
 
-def test_create_submenu():
+async def test_create_submenu(ac_client: AsyncClient):
     """Тестирует создание субменю."""
 
     target_menu_id = save_data['id']
-    response = client.post(
+    response = await ac_client.post(
         reverse('Создает подменю',
                 **{'target_menu_id': target_menu_id}),
         json={
@@ -44,12 +46,12 @@ def test_create_submenu():
     assert data['id'] == save_data['sub_id']
 
 
-def test_create_dish_first():
+async def test_create_dish_first(ac_client: AsyncClient):
     """Тестирует создание 1-го блюда."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.post(
+    response = await ac_client.post(
         reverse('Создает блюдо',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}),
@@ -69,12 +71,12 @@ def test_create_dish_first():
     assert data['id'] == save_data['dis_id']
 
 
-def test_create_dish_second():
+async def test_create_dish_second(ac_client: AsyncClient):
     """Тестирует создание 2-го блюда."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.post(
+    response = await ac_client.post(
         reverse('Создает блюдо',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}),
@@ -94,11 +96,11 @@ def test_create_dish_second():
     assert data['id'] == save_data['dis_id']
 
 
-def test_get_submenu_dish_count():
+async def test_get_submenu_dish_count(ac_client: AsyncClient):
     """Тестирует просмотр определенного меню с количеством субменю и блюд."""
 
     target_menu_id = save_data['id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает определенное меню',
                 **{'target_menu_id': target_menu_id}),
     )
@@ -112,12 +114,12 @@ def test_get_submenu_dish_count():
     assert data['description'] == 'My menu description 1'
 
 
-def test_get_dish_count():
+async def test_get_dish_count(ac_client: AsyncClient):
     """Тестирует просмотр определенного субменю с количеством блюд."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает определенное подменю',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}),
@@ -129,12 +131,12 @@ def test_get_dish_count():
     assert data['dishes_count'] == 2
 
 
-def test_delete_submenu():
+async def test_delete_submenu(ac_client: AsyncClient):
     """Тестирует удаление субменю."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.delete(
+    response = await ac_client.delete(
         reverse('Удаляет подменю',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}
@@ -144,11 +146,11 @@ def test_delete_submenu():
     assert response.status_code == 200, response.text
 
 
-def test_get_submenus():
+async def test_get_submenus(ac_client: AsyncClient):
     """Тестирует список субменю."""
 
     target_menu_id = save_data['id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает список подменю',
                 **{'target_menu_id': target_menu_id}),
     )
@@ -158,12 +160,12 @@ def test_get_submenus():
     assert data == []
 
 
-def test_get_empty_dishes():
+async def test_get_empty_dishes(ac_client: AsyncClient):
     """Тестирует просмотр списка блюд."""
 
     target_menu_id = save_data['id']
     target_submenu_id = save_data['sub_id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает список блюд',
                 **{'target_menu_id': target_menu_id,
                    'target_submenu_id': target_submenu_id}
@@ -175,11 +177,11 @@ def test_get_empty_dishes():
     assert data == []
 
 
-def test_get_one_menu():
+async def test_get_one_menu(ac_client: AsyncClient):
     """Тестирует просмотр меню."""
 
     target_menu_id = save_data['id']
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает определенное меню',
                 **{'target_menu_id': target_menu_id}),
     )
@@ -191,11 +193,11 @@ def test_get_one_menu():
     assert data['id'] == target_menu_id
 
 
-def test_delete_menu():
+async def test_delete_menu(ac_client: AsyncClient):
     """Тестирует удаление меню."""
 
     target_menu_id = save_data['id']
-    response = client.delete(
+    response = await ac_client.delete(
         reverse('Удаляет меню',
                 **{'target_menu_id': target_menu_id}),
     )
@@ -203,10 +205,10 @@ def test_delete_menu():
     assert response.status_code == 200, response.text
 
 
-def test_get_empty_menus():
+async def test_get_empty_menus(ac_client: AsyncClient):
     """Тестирует пустой список меню."""
 
-    response = client.get(
+    response = await ac_client.get(
         reverse('Просматривает список меню'),
     )
     assert response.headers.get('content-type') == 'application/json', 'Is not application/json'
