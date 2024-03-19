@@ -1,16 +1,11 @@
-import os
-
-from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.util import deprecations
 
-load_dotenv()
+from ..config import SQLALCHEMY_DATABASE_URL
 
 deprecations.SILENCE_UBER_WARNING = True
-
-SQLALCHEMY_DATABASE_URL = os.getenv('DB_URL')
 
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
 

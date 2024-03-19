@@ -1,12 +1,10 @@
-import os
 import pickle
 
-from dotenv import load_dotenv
 from redis import asyncio
 
 from menu_restaurant.database import models
 
-load_dotenv('.env.work')
+from ..config import REDIS_HOST, REDIS_PORT
 
 HASH_NAME: str = 'full_menu'
 """Переменная для присвоения имению хэшу"""
@@ -15,8 +13,8 @@ HASH_NAME: str = 'full_menu'
 class RedisCache:
     """Класс для установки соединения с redis и работой с кешем."""
 
-    __rd: asyncio.Redis = asyncio.Redis(host=os.environ['REDIS_HOST'],
-                                        port=int(os.environ['REDIS_PORT']))
+    __rd: asyncio.Redis = asyncio.Redis(host=REDIS_HOST,
+                                        port=int(REDIS_PORT))
 
     @classmethod
     async def get_all_menu_cache(cls) -> list[models.Menus] | list[None]:

@@ -1,8 +1,6 @@
 import asyncio
-import os
 
 import pytest
-from dotenv import load_dotenv
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,13 +9,11 @@ from sqlalchemy.util import deprecations
 
 from menu_restaurant.database.confdb import Base, get_db
 
+from ..config import TEST_DATABASE_URL
 from ..main import app
-
-load_dotenv()
 
 deprecations.SILENCE_UBER_WARNING = True
 
-TEST_DATABASE_URL = os.getenv('DB_URL_TEST')
 
 engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
 
